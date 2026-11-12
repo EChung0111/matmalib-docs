@@ -1,0 +1,47 @@
+:root {
+  --md-text-font: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --md-code-font: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --md-primary-fg-color: #123f41;
+  --md-accent-fg-color: #267a64;
+}
+[data-md-color-scheme="default"] { --md-default-bg-color: #fcfcf8; }
+[data-md-color-scheme="slate"] { --md-hue: 185; --md-accent-fg-color: #b6e7ac; --md-typeset-a-color: #b6e7ac; }
+.md-header { box-shadow: none; }
+.md-tabs { border-bottom: 1px solid #ffffff20; }
+.md-typeset h1, .md-typeset h2 { font-weight: 650; letter-spacing: -.035em; }
+.md-typeset h1 { color: var(--md-default-fg-color); }
+.md-typeset h2 { margin-top: 2em; }
+.md-typeset { font-size: .81rem; line-height: 1.75; }
+.md-typeset .admonition, .md-typeset details { font-size: .76rem; }
+.md-typeset .md-button { border-radius: .3rem; border-width: 1px; padding: .65em 1.3em; font-size: .76rem; }
+.md-typeset .md-button--primary { background: #123f41; border-color: #123f41; color: white; }
+.hero { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; align-items: center; padding: 1rem 0 2rem; border-bottom: 1px solid var(--md-default-fg-color--lightest); }
+.hero h1 { font-size: clamp(2.1rem, 4.2vw, 3.25rem); line-height: 1.08; margin: .5rem 0 1rem; max-width: 16ch; }
+.hero p { max-width: 40rem; }
+.eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: .61rem; font-weight: 750; color: var(--md-typeset-a-color); }
+.hero-art { width: 100%; height: auto; }
+.feature-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; margin: 1.5rem 0; }
+.feature { border-top: 2px solid var(--md-default-fg-color--lightest); padding: .4rem 0; }
+.feature h3 { margin: .5rem 0; }
+.feature p { font-size: .75rem; margin: .35rem 0; }
+.feature small { color: var(--md-default-fg-color--light); }
+/* Every live editor remains readable without JavaScript. */
+pre.pyodide { border-left: 3px solid #368574; padding: 1rem; overflow: auto; background: var(--md-code-bg-color); }
+.lab { margin: 1.4rem 0; border: 1px solid var(--md-default-fg-color--lightest); border-radius: .45rem; overflow: hidden; background: var(--md-default-bg-color); }
+.lab-bar { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; padding: .55rem .75rem; background: var(--md-code-bg-color); border-bottom: 1px solid var(--md-default-fg-color--lightest); }
+.lab-label { font-family: var(--md-code-font); font-size: .62rem; font-weight: 700; letter-spacing: .02em; margin-right: auto; }
+.lab-label::before { content: ""; display: inline-block; width: .4rem; height: .4rem; background: #439b7e; border-radius: 50%; margin-right: .4rem; }
+.lab button { cursor: pointer; border: 1px solid var(--md-default-fg-color--lighter); border-radius: .25rem; padding: .25rem .6rem; font-size: .63rem; line-height: 1.6; color: var(--md-default-fg-color); }
+.lab button[data-action="run"] { background: #123f41; border-color: #123f41; color: #fff; }
+.lab button:disabled { opacity: .5; cursor: wait; }
+.lab button:focus-visible, .lab textarea:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: -2px; }
+.lab textarea { display: block; box-sizing: border-box; width: 100%; min-height: 8rem; max-height: 32rem; padding: .8rem 1rem; border: 0; border-radius: 0; resize: vertical; color: var(--md-code-fg-color); background: var(--md-code-bg-color); font: .65rem/1.7 var(--md-code-font); tab-size: 4; white-space: pre; overflow: auto; }
+.lab-status { font-size: .61rem; color: var(--md-default-fg-color--light); padding: .45rem .8rem; border-top: 1px solid var(--md-default-fg-color--lightest); }
+.lab-output:not(:empty) { border-top: 1px solid var(--md-default-fg-color--lightest); padding: .7rem 1rem; max-height: 44rem; overflow: auto; }
+.lab-output pre { margin: 0; font: .65rem/1.65 var(--md-code-font); white-space: pre-wrap; overflow-wrap: anywhere; }
+.lab-output img { display: block; max-width: 100%; background: #fff; border-radius: .25rem; margin: .6rem 0; }
+.lab-output .lab-error { color: #bd3939; }
+.lab-download { display: inline-block; font-size: .65rem; margin: .25rem .8rem .25rem 0; }
+.md-typeset table:not([class]) { font-size: .7rem; }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; gap: 0; } .hero-art { max-width: 17rem; margin: 0 auto; } .hero h1 { max-width: 20ch; } .feature-grid { grid-template-columns: 1fr; gap: .3rem; } .lab textarea { font-size: 12px; } }
+@media print { .lab-bar button, .lab-status { display: none; } .lab textarea { max-height: none; } }

@@ -1,0 +1,1740 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Computational chemistry, from molecular coordinates to publication-ready figures. Learn with runnable Python tutorials and a complete API reference.">
+      
+      
+      
+        <link rel="canonical" href="https://EChung0111.github.io/matmalib-docs/learn/molecules/">
+      
+      
+        <link rel="prev" href="../../features/">
+      
+      
+        <link rel="next" href="../io/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/mark.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Molecules and geometry - matmalib</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/styles.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#molecules-and-geometry" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="matmalib" class="md-header__button md-logo" aria-label="matmalib" data-md-component="logo">
+      
+  <img src="../../assets/mark.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            matmalib
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Molecules and geometry
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/EChung0111/matmalib-docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    EChung0111/matmalib-docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Get started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="matmalib" class="md-nav__button md-logo" aria-label="matmalib" data-md-component="logo">
+      
+  <img src="../../assets/mark.svg" alt="logo">
+
+    </a>
+    matmalib
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/EChung0111/matmalib-docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    EChung0111/matmalib-docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../browser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Molecules and geometry
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Molecules and geometry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#build-a-state-from-coordinates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build a state from coordinates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#look-up-element-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Look up element symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measure-distances-angles-and-dihedrals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measure distances, angles, and dihedrals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#infer-bonds-and-separate-molecules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infer bonds and separate molecules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-an-acyclic-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edit an acyclic chain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maintain-atoms-and-connectivity-explicitly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintain atoms and connectivity explicitly
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-a-structure-in-a-notebook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect a structure in a notebook
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reading and writing files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ensembles and energies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glycans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glycans and SNFG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../puckering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ring puckering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trajectories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Molecular trajectories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conformers and clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting and styling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../free-energy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Free-energy surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IR spectra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units and conventions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core behavior and limitations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data and attribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation and deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#build-a-state-from-coordinates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build a state from coordinates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#look-up-element-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Look up element symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#measure-distances-angles-and-dihedrals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Measure distances, angles, and dihedrals
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#infer-bonds-and-separate-molecules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infer bonds and separate molecules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-an-acyclic-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edit an acyclic chain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maintain-atoms-and-connectivity-explicitly" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintain atoms and connectivity explicitly
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-a-structure-in-a-notebook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect a structure in a notebook
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="molecules-and-geometry">Molecules and geometry<a class="headerlink" href="#molecules-and-geometry" title="Permanent link">&para;</a></h1>
+<p>Matmalib represents a geometry as a <code>State</code>, containing an ordered list of <code>Atom</code> objects. A <code>Fragment</code> groups existing atoms, and a <code>Space</code> collects states. Coordinates are ordinary NumPy arrays, so the same objects work with the <a href="../conformers/">conformer</a> and <a href="../glycans/">carbohydrate</a> tools.</p>
+<p>This tutorial builds a molecule, measures internal coordinates, edits an acyclic chain, and separates disconnected fragments. See <a href="../../reference/core-notes/">core reference notes</a> for the complete method inventory and current limitations.</p>
+<h2 id="build-a-state-from-coordinates">Build a state from coordinates<a class="headerlink" href="#build-a-state-from-coordinates" title="Permanent link">&para;</a></h2>
+<p>Always provide three coordinates to <code>Atom</code>, use floating-point coordinates when editing, and pass <code>index=</code> explicitly. The third positional argument is <code>valence</code>, which is currently unused. Use angstroms for molecular coordinates so the default bond thresholds have their intended meaning.</p>
+<pre class="pyodide"><code>import numpy as np
+from matmalib import Atom, State
+
+water = State(
+    id="water",
+    atoms=[
+        Atom(coord=[0.0, 0.0, 0.0], type="O", index=0),
+        Atom(coord=[0.9572, 0.0, 0.0], type="H", index=1),
+        Atom(coord=[-0.2390, 0.9270, 0.0], type="H", index=2),
+    ],
+    NAtoms=3,
+)
+for atom, mass in zip(water.atoms, [15.999, 1.008, 1.008]):
+    atom.mass = mass
+
+print("Coordinates (angstrom):\n", water.xyz)
+print("Atomic masses (u):", water.Mass)
+print("Total mass (u):", water.mass)
+print("O-H distance:", round(water.measure_internal([0, 1]), 4))
+angle, axis = water.measure_internal([1, 0, 2])
+print("H-O-H angle (degrees):", round(angle, 2))</code></pre>
+<p>The O–H bond is 0.9572 Å; the angle is approximately 104.46°. <code>xyz</code> has shape <code>(n_atoms, 3)</code>, <code>Mass</code> has shape <code>(n_atoms,)</code>, and <code>mass</code> sums the supplied atomic masses. Matmalib does not populate atomic masses automatically. The example uses conventional average masses; use isotope masses if your calculation requires them.</p>
+<p><strong>Try changing:</strong> move the third atom, run again, and compare its angle. Masses do not affect these geometric measurements.</p>
+<p><code>State(**kwargs)</code> stores the attributes you supply; it does not validate or complete a molecular model. Supply <code>atoms</code>, <code>NAtoms</code>, and <code>id</code> when using connectivity, visualization, or writers. <code>xyz</code> and <code>Mass</code> assemble new arrays each time: edit <code>state.atoms[i].coord</code>, rather than expecting <code>state.xyz[i] = ...</code> to persist. The atom's <code>x</code>, <code>y</code>, and <code>z</code> attributes are snapshots created at initialization and do not track later coordinate edits; read <code>coord</code> instead.</p>
+<h2 id="look-up-element-symbols">Look up element symbols<a class="headerlink" href="#look-up-element-symbols" title="Permanent link">&para;</a></h2>
+<p><code>State.element_symbol(8)</code> returns <code>"O"</code>; <code>StateBuilder.element_symbol("8")</code> uses the same mapping. In the other direction, <code>InputBuilder.element_number("O")</code> returns <code>8</code>. The underlying <code>ELEMENT_SYMBOLS</code> and <code>ELEMENT_NUMBERS</code> dictionaries cover elements 1–118, with string atomic-number keys and case-sensitive element symbols respectively. They provide identifiers, not atomic masses or valence information. The <a href="../../reference/core-notes/#element-mappings">element utilities example</a> lets you run all three wrappers and inspect the dictionaries.</p>
+<h2 id="measure-distances-angles-and-dihedrals">Measure distances, angles, and dihedrals<a class="headerlink" href="#measure-distances-angles-and-dihedrals" title="Permanent link">&para;</a></h2>
+<p>Atom selections use <strong>zero-based positions</strong> in <code>state.atoms</code>. The older distance/angle editing and connectivity routines also require <code>atom.id</code> to equal that position. Dihedral measurements and edits use positions independently of <code>Atom.id</code> and accept Python or NumPy integers; other legacy geometry methods require Python <code>int</code> values. Do not mix integer positions and Atom objects in a selection.</p>
+<pre class="pyodide"><code>import numpy as np
+from matmalib import Atom, State, StateEditor
+
+points = [[0.0, 1.0, 0.0], [0.0, 0.0, 0.0],
+          [1.4, 0.0, 0.0], [1.4, 0.0, 1.0]]
+chain = State(id="four_atoms", NAtoms=4, atoms=[
+    Atom(coord=p, type="C", index=i) for i, p in enumerate(points)
+])
+
+print("Distance:", StateEditor.get_distance([1, 2], state=chain))
+angle, axis = StateEditor.get_angle([0, 1, 2], state=chain)
+print("Angle and axis:", angle, axis)
+print("Dihedral:", StateEditor.get_dihedral([0, 1, 2, 3], state=chain))
+print("Atom-object selection:", StateEditor.measure(chain.atoms[:2]))
+
+for atom in chain.atoms:
+    atom.coord += np.array([10.0, -4.0, 7.0])
+print("Dihedral after translation:", chain.measure_internal([0, 1, 2, 3]))</code></pre>
+<p>This idealized geometry gives a 1.4 Å central distance, a 90° angle, and a <strong>+90° dihedral</strong>, which remains +90° after translation. The angle is centered on the middle atom. A dihedral describes the planes formed by atoms <code>(0, 1, 2)</code> and <code>(1, 2, 3)</code>. Its positive direction follows a right-handed rotation about the central bond from atom 1 toward atom 2; see the <a href="../../reference/conventions/#torsion-definitions">signed torsion convention</a> for the formula.</p>
+<table>
+<thead>
+<tr>
+<th>Selection</th>
+<th><code>State.measure_internal</code> / <code>StateEditor.measure</code> return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Two atoms</td>
+<td>Distance as a float, in input coordinate units</td>
+</tr>
+<tr>
+<td>Three atoms</td>
+<td><code>(angle_degrees, axis_vector)</code>; the axis is an unnormalized cross product</td>
+</tr>
+<tr>
+<td>Four atoms</td>
+<td>Signed dihedral in degrees</td>
+</tr>
+</tbody>
+</table>
+<p><code>get_dihedral(..., ax=True)</code> returns <code>(dihedral_degrees, axis_vector)</code>. This compatibility axis is the unnormalized cross product of the two plane normals; it can be zero for a planar geometry, even though its dihedral is defined. <code>get_distance</code>, <code>get_angle</code>, and <code>get_dihedral</code> accept either all Atom objects, or all integer positions with a <code>state</code>. <code>get_dihedral</code> requires exactly four atoms with finite three-component coordinates and rejects negative/out-of-range positions, coincident central atoms, or collinear triples with <code>ValueError</code>. The older distance and angle length checks only print warnings. <code>measure</code> returns <code>None</code> for a selection length other than two, three, or four.</p>
+<p><strong>Try changing:</strong> change the last coordinate in <code>points</code> from <code>1.0</code> to <code>-1.0</code>. This reflection changes the dihedral to −90°, and translating the whole geometry still leaves it unchanged. For ring analysis use the dedicated <a href="../puckering/">puckering functions</a>.</p>
+<p><strong>Compatibility:</strong> <code>StateEditor.get_dihedral</code>, <code>StateEditor.measure</code>, and <code>State.measure_internal</code> now use the same signed <code>atan2</code> convention as the glycan torsion routines. This corrects the reversed legacy sign and its translation-dependent error. Existing glycan and ring-analysis results are unchanged. Recompute previously saved legacy dihedrals from coordinates when possible; simply negating them cannot repair values affected by the old translation bug.</p>
+<h2 id="infer-bonds-and-separate-molecules">Infer bonds and separate molecules<a class="headerlink" href="#infer-bonds-and-separate-molecules" title="Permanent link">&para;</a></h2>
+<p><code>connectivity_matrix()</code> sets three attributes: <code>conn_mat</code>, a symmetric zero/one matrix; <code>graph</code>, a NetworkX graph; and <code>Nmols</code>, the number of connected components. It returns <code>None</code>. A heavy-atom pair is connected when its distance is strictly less than <code>distXX</code> (default 1.65 Å), and any pair involving hydrogen uses <code>distXH</code> (default 1.15 Å).</p>
+<pre class="pyodide"><code>from matmalib import Atom, State, StateEditor
+
+points = [[0.0, 0.0, 0.0], [1.4, 0.0, 0.0],
+          [5.0, 0.0, 0.0], [6.4, 0.0, 0.0]]
+state = State(id="two_fragments", NAtoms=4, atoms=[
+    Atom(coord=p, type="C", index=i) for i, p in enumerate(points)
+])
+state.connectivity_matrix()
+state.system_split()
+
+print("Bond matrix:\n", state.conn_mat)
+print("Connected components:", state.Nmols)
+print("Neighbors of atom 0:", StateEditor.adjacent_atoms(state.conn_mat, 0))
+for fragment in state.mols:
+    print("Fragment atom IDs:", [atom.id for atom in fragment.atoms])</code></pre>
+<p>You should find two fragments: atoms <code>[0, 1]</code> and <code>[2, 3]</code>. <code>system_split()</code> reads the existing <code>state.graph</code> and stores <code>Fragment</code> instances in <code>state.mols</code>. Fragments share Atom objects with their parent state, so moving a fragment atom also moves the corresponding state atom. Their <code>xyz</code> and <code>Mass</code> properties assemble the member coordinates and masses.</p>
+<p><strong>Try changing:</strong> set <code>distXX=4.0</code> and see how the components merge. This illustrates why a distance cutoff is a bonding heuristic, not a bond-order or valence model. There are no periodic boundary conditions, minimum-image distances, or element-specific covalent radii in this method.</p>
+<p>The legacy hydrogen ambiguity branch currently calls a nonexistent list method if a hydrogen is close to more than one possible neighbor. For problematic geometries, supply an explicit connectivity matrix and graph instead of relying on that branch. Carbohydrate auto-detection has its own connectivity implementation, described in <a href="../glycans/">glycans</a>.</p>
+<h2 id="edit-an-acyclic-chain">Edit an acyclic chain<a class="headerlink" href="#edit-an-acyclic-chain" title="Permanent link">&para;</a></h2>
+<p>Geometry edits move the connected component on the second side of a selected bond. Create connectivity first, work on a copy when preserving the input matters, and remeasure after an edit. These are geometric transformations, not energy minimization.</p>
+<pre class="pyodide"><code>import copy
+from matmalib import Atom, State, StateEditor
+
+points = [[0.0, 1.0, 0.0], [0.0, 0.0, 0.0],
+          [1.4, 0.0, 0.0], [1.4, 0.0, 1.0]]
+original = State(id="chain", NAtoms=4, atoms=[
+    Atom(coord=p, type="C", index=i) for i, p in enumerate(points)
+])
+original.connectivity_matrix()
+edited = copy.deepcopy(original)
+editor = StateEditor(edited)
+
+carried = editor.determine_carried_atoms(edited, [1, 2])
+print("Atoms moved with atom 2:", [atom.id for atom in carried])
+editor.set_distance([1, 2], new_distance=1.5)
+editor.set_angle([0, 1, 2], new_ang=110.0)
+editor.set_dihedral([0, 1, 2, 3], new_dih=60.0)
+
+print("Edited distance:", round(edited.measure_internal([1, 2]), 3))
+print("Edited angle:", round(edited.measure_internal([0, 1, 2])[0], 3))
+print("Edited dihedral:", round(edited.measure_internal([0, 1, 2, 3]), 3))
+print("Original distance:", original.measure_internal([1, 2]))</code></pre>
+<p>The moved atoms are <code>[2, 3]</code>; the result measures 1.5 Å, 110°, and 60°, while the original retains its 1.4 Å central bond.</p>
+<p><strong>Try changing:</strong> choose a target dihedral of −60°, 0°, or 180°, or a distance of 1.6 Å. Re-run the full cell to start each experiment from the same geometry. With <code>editor.set_dihedral(..., incr=True)</code>, <code>new_dih</code> is an increment in degrees rather than an absolute target: adding +30° to +60° gives +90°. Targets and increments wrap modulo 360°, so 780° is equivalent to 60°. Exact planar targets of 0° and ±180° are supported; +180° and −180° describe the same conformation.</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Parameters and effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>state.set_internal(atom_list, val)</code></td>
+<td>Dispatches by selection length to a distance, angle, or dihedral edit; mutates atoms and returns <code>None</code></td>
+</tr>
+<tr>
+<td><code>editor.set_distance([a, b], new_distance)</code></td>
+<td>Translates the component on <code>b</code>'s side of bond <code>a–b</code>; distance is in input units</td>
+</tr>
+<tr>
+<td><code>editor.set_angle([a, b, c], new_ang)</code></td>
+<td>Rotates <code>c</code>'s component around <code>b</code>; target is in degrees</td>
+</tr>
+<tr>
+<td><code>editor.set_dihedral([a, b, c, d], new_dih, incr=False, axis_pos="bond", threshold=0.1)</code></td>
+<td>Rotates the component on <code>c</code>'s side of bond <code>b–c</code> around that central bond; default pivot is its midpoint</td>
+</tr>
+<tr>
+<td><code>axis_pos="term"</code></td>
+<td>Rotates atoms beyond <code>d</code> about a line through <code>d</code> parallel to <code>b–c</code>; this legacy mode leaves the selected quartet's dihedral unchanged</td>
+</tr>
+<tr>
+<td><code>threshold</code></td>
+<td>Nonnegative angular tolerance in degrees; skips changes at or below this tolerance without shifting planar targets away from 0° or ±180°</td>
+</tr>
+</tbody>
+</table>
+<p>The distance and angle setters require exactly two or three Python integer positions respectively. <code>set_dihedral</code> accepts four distinct Python or NumPy integer positions within the state. The setters return <code>None</code> and do not update graph topology, cached fragments, or <code>Atom.x/y/z</code>. <code>set_dihedral</code> requires finite target and tolerance values, validates <code>axis_pos</code>, and uses a finite symmetric <code>conn_mat</code> indexed by atom position. It preserves connectivity while selecting the atoms to move and rejects attempts to rotate a central bond in a ring before editing coordinates or connectivity.</p>
+<p>The distance and angle setters still use the legacy <code>determine_carried_atoms</code> helper. That helper temporarily removes the chosen bond from <code>conn_mat</code>, selects the component containing its second atom, and normally restores the bond. If the graph remains connected, it prints <code>Matrix still connected</code>, returns <code>None</code>, and currently fails to restore the removed bond. Use those setters and the helper only on bonds whose removal separates the relevant components, and keep a copy. <code>set_dihedral</code> does not use this helper; it does not support ring-closure editing either.</p>
+<h2 id="maintain-atoms-and-connectivity-explicitly">Maintain atoms and connectivity explicitly<a class="headerlink" href="#maintain-atoms-and-connectivity-explicitly" title="Permanent link">&para;</a></h2>
+<p><code>State.add_atoms(atom)</code> appends one atom and <code>State.remove_atoms(atom)</code> removes one object. Neither method updates counts, IDs, or graphs. After structural changes, explicitly synchronize these fields before calling the older geometry tools:</p>
+<pre class="pyodide"><code>from matmalib import Atom, State, StateEditor
+import networkx as nx
+
+state = State(id="pair", NAtoms=1, atoms=[
+    Atom(coord=[0.0, 0.0, 0.0], type="C", index=0)
+])
+added = Atom(coord=[1.4, 0.0, 0.0], type="C", index=1)
+state.add_atoms(added)
+state.NAtoms = len(state.atoms)
+for index, atom in enumerate(state.atoms):
+    atom.id = index
+state.connectivity_matrix()
+
+StateEditor.disconnect_atoms(state, 0, 1)
+print("Disconnected:", state.conn_mat[0, 1])
+StateEditor.connect_atoms(state, 0, 1)
+print("Connected:", state.conn_mat[0, 1])
+# These helpers change only conn_mat. Rebuild graph when needed.
+state.graph = nx.from_numpy_array(state.conn_mat)
+state.Nmols = nx.number_connected_components(state.graph)
+state.system_split()
+print("Fragments:", len(state.mols))
+
+state.remove_atoms(added)
+state.NAtoms = len(state.atoms)
+for index, atom in enumerate(state.atoms):
+    atom.id = index
+state.connectivity_matrix()
+state.system_split()
+print("Remaining atoms:", state.NAtoms)</code></pre>
+<p>For custom bonds, initialize a symmetric <code>(NAtoms, NAtoms)</code> matrix, keep its diagonal zero, and create <code>graph</code> with <code>nx.from_numpy_array</code>. <code>connect_atoms</code> and <code>disconnect_atoms</code> mutate the two symmetric entries only; <code>adjacent_atoms</code> returns the nonzero column indices in a row.</p>
+<h2 id="inspect-a-structure-in-a-notebook">Inspect a structure in a notebook<a class="headerlink" href="#inspect-a-structure-in-a-notebook" title="Permanent link">&para;</a></h2>
+<p><code>State.show(width=600, height=600)</code> creates a Py3Dmol stick rendering, zooms to the structure, and displays it. It requires an environment that renders Py3Dmol's HTML/JavaScript. It returns <code>None</code> rather than a viewer handle.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Space</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">state</span> <span class="o">=</span> <span class="n">Space</span><span class="o">.</span><span class="n">from_xyz</span><span class="p">(</span><span class="s2">"tests/data/glucose.xyz"</span><span class="p">)</span><span class="o">.</span><span class="n">states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">state</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">700</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+</code></pre></div>
+<p>The browser tutorial runner executes Python and Matplotlib examples; this notebook viewer example should be run in Jupyter. Continue to <a href="../io/">reading and writing data</a> or <a href="../ensembles/">working with ensembles</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../features/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Feature map">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Feature map
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../io/" class="md-footer__link md-footer__link--next" aria-label="Next: Reading and writing files">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Reading and writing files
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.3.9"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../assets/playground.js"></script>
+      
+    
+  </body>
+</html>
