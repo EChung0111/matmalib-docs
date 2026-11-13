@@ -1,0 +1,2220 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Molecular analysis and machine-learning simulations, from coordinates to free-energy figures. Learn with runnable Python tutorials and a complete API reference.">
+      
+      
+      
+        <link rel="canonical" href="https://EChung0111.github.io/matmalib-docs/learn/mlmd-analysis/">
+      
+      
+        <link rel="prev" href="../mlmd-restarts/">
+      
+      
+        <link rel="next" href="../molecules/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/mark.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Analyze free energy and kinetics - matmalib</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/styles.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#analyze-metadynamics-and-plot-a-1d-free-energy-profile" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="matmalib" class="md-header__button md-logo" aria-label="matmalib" data-md-component="logo">
+      
+  <img src="../../assets/mark.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            matmalib
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Analyze free energy and kinetics
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/EChung0111/matmalib-docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    EChung0111/matmalib-docs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Get started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../mlmd/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Run MLMD
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../molecules/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../reference/api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contributing
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="matmalib" class="md-nav__button md-logo" aria-label="matmalib" data-md-component="logo">
+      
+  <img src="../../assets/mark.svg" alt="logo">
+
+    </a>
+    matmalib
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/EChung0111/matmalib-docs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    EChung0111/matmalib-docs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first analysis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../browser/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run MLMD
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Run MLMD
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlmd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Start a simulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlmd-solvation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Solvate a system
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlmd-metadynamics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run metadynamics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mlmd-restarts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Save and restart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analyze free energy and kinetics
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Analyze free energy and kinetics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#choose-the-input-that-contains-the-information-you-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose the input that contains the information you need
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#start-with-an-existing-fes-grid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start with an existing FES grid
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reweight-a-normalized-colvar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reweight a normalized COLVAR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-a-histogram-and-its-unsampled-regions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect a histogram and its unsampled regions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-defaults-and-walls-from-the-saved-plumed-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read defaults and walls from the saved PLUMED input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reconstruct-from-hills-on-your-computer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reconstruct from HILLS on your computer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reconstruct from HILLS on your computer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#periodic-cvs-and-multidimensional-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Periodic CVs and multidimensional profiles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compare-time-blocks-before-interpreting-the-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compare time blocks before interpreting the profile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#smooth-the-display-and-export-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Smooth the display and export results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analyze-independent-infrequent-metadynamics-passages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyze independent infrequent-metadynamics passages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../molecules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Molecules and geometry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reading and writing files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ensembles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ensembles and energies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glycans/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glycans and SNFG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../puckering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ring puckering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trajectories/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Molecular trajectories
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../conformers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conformers and clustering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plotting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plotting and styling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../free-energy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Free-energy surfaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spectra/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IR spectra
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Units and conventions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/core-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core behavior and limitations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/mlmd-script-parity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLMD script feature map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/mlmd-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLMD configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data and attribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Contributing
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Documentation and deployment
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#choose-the-input-that-contains-the-information-you-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose the input that contains the information you need
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#start-with-an-existing-fes-grid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Start with an existing FES grid
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reweight-a-normalized-colvar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reweight a normalized COLVAR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-a-histogram-and-its-unsampled-regions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect a histogram and its unsampled regions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-defaults-and-walls-from-the-saved-plumed-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read defaults and walls from the saved PLUMED input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reconstruct-from-hills-on-your-computer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reconstruct from HILLS on your computer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Reconstruct from HILLS on your computer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#periodic-cvs-and-multidimensional-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Periodic CVs and multidimensional profiles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compare-time-blocks-before-interpreting-the-profile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compare time blocks before interpreting the profile
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#smooth-the-display-and-export-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Smooth the display and export results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analyze-independent-infrequent-metadynamics-passages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analyze independent infrequent-metadynamics passages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="analyze-metadynamics-and-plot-a-1d-free-energy-profile">Analyze metadynamics and plot a 1D free-energy profile<a class="headerlink" href="#analyze-metadynamics-and-plot-a-1d-free-energy-profile" title="Permanent link">&para;</a></h1>
+<p>Use <code>mlmd.analyze_metadynamics()</code> to reconstruct a one-dimensional free-energy surface (FES), compare basin populations, inspect sampling diagnostics, and export results. <code>Plot.fes_1d()</code> plots the resulting <code>Data</code> object. Analysis does not require a model, GPU, or ASE calculator.</p>
+<p>The runnable examples below use <strong>synthetic data to demonstrate the algorithms</strong>. They do not represent a converged molecular simulation or a measured reaction rate. Each example creates its own small input files and runs independently in the browser. Reconstructing a profile from HILLS requires the PLUMED command-line executable on your computer; existing FES grids and normalized COLVAR analysis run in the browser.</p>
+<h2 id="choose-the-input-that-contains-the-information-you-need">Choose the input that contains the information you need<a class="headerlink" href="#choose-the-input-that-contains-the-information-you-need" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th><code>AnalysisConfig</code> fields</th>
+<th>What is calculated</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Existing one-dimensional FES</td>
+<td><code>fes_file</code>, <code>cv</code>, <code>energy_column</code></td>
+<td>Load the grid, convert energies, set its minimum to zero, and analyze basins</td>
+</tr>
+<tr>
+<td>Regularly sampled COLVAR with normalized bias</td>
+<td><code>colvar</code>, <code>rbias_column</code>, or <code>bias_column</code> together with <code>rct_column</code></td>
+<td>A weighted histogram and relative <code>-RT ln(probability density)</code></td>
+</tr>
+<tr>
+<td>HILLS from a supported one-dimensional run</td>
+<td><code>hills</code>, optionally <code>plumed</code> and <code>grid_range</code></td>
+<td>A profile reconstructed by PLUMED <code>sum_hills</code></td>
+</tr>
+<tr>
+<td>Independent infrequent-metadynamics trajectories</td>
+<td><code>colvar=[...]</code>, <code>infrequent=True</code>, explicit basins, raw bias or acceleration column</td>
+<td>First-passage rate estimates and diagnostics; a FES needs suitable additional information</td>
+</tr>
+</tbody>
+</table>
+<p>Supply <code>cv</code> and <code>temperature</code>, or provide a <code>plumed_input</code> from which they can be read. Input energies default to <code>"kJ/mol"</code>; <code>"kcal/mol"</code> and <code>"eV"</code> are accepted. Output arrays and exported energy columns are always <strong>kJ/mol</strong>. <code>cv_unit</code> labels the coordinate; it does not rescale it. <code>time_unit</code> accepts <code>"fs"</code>, <code>"ps"</code>, <code>"ns"</code>, or <code>"s"</code> and defaults to <code>"ps"</code>.</p>
+<h2 id="start-with-an-existing-fes-grid">Start with an existing FES grid<a class="headerlink" href="#start-with-an-existing-fes-grid" title="Permanent link">&para;</a></h2>
+<p>PLUMED-style tables start with a <code>FIELDS</code> header. The default energy column is <code>file.free</code>; use <code>energy_column="your_column"</code> for another name. A supplied FES needs at least three distinct, finite coordinate points and finite energies. Its points are sorted into increasing coordinate order.</p>
+<pre class="pyodide"><code>from pathlib import Path
+import numpy as np
+from matmalib import mlmd, Plot
+
+q = np.linspace(-1.5, 1.5, 101)
+energy = 8 * (q**2 - 1)**2 + 0.4 * q
+np.savetxt("example-fes.dat", np.column_stack((q, energy)),
+           header="#! FIELDS q file.free", comments="")
+
+simulation = mlmd()
+fes = simulation.analyze_metadynamics(mlmd.AnalysisConfig(
+    fes_file="example-fes.dat", cv="q", cv_unit="dimensionless",
+    temperature=300, energy_unit="kJ/mol",
+    reactant=(-1.4, -0.5), product=(0.5, 1.4),
+))
+print("Points:", len(fes.x), "Minimum:", fes.free_energy.min(), fes.energy_unit)
+print("Product minus reactant:",
+      round(fes.summary["delta_g_product_minus_reactant_kj_mol"], 3), "kJ/mol")
+print("Projected forward barrier:",
+      round(fes.summary["delta_g_dagger_forward_projected_kj_mol"], 3), "kJ/mol")
+fig, ax = Plot().fes_1d(fes, smooth_window=0)
+ax.set_title("Synthetic double-well profile")</code></pre>
+<p>The right-hand basin has a higher free energy, so the reported product-minus-reactant difference is positive. This difference integrates each basin's probability, including its width:</p>
+<p><code>ΔG(product − reactant) = −RT ln(Pproduct / Preactant)</code></p>
+<p>It is not the difference between the two minimum energies. At fixed volume, this quantity is a Helmholtz free-energy difference, <code>ΔF</code>. The analysis does not add standard-state, concentration, or radial Jacobian corrections.</p>
+<p>Provide <strong>both</strong> <code>reactant=(low, high)</code> and <code>product=(low, high)</code>, or neither. Ranges must increase, be disjoint, lie inside the profile, and contain sampled probability. Without them, the implementation tries to infer two geometric basins separated by a fully sampled barrier at least <code>RT</code> above both minima. Check <code>summary["basin_assignment"]</code> and review inferred ranges against the chemistry.</p>
+<p>A projected barrier is the intervening profile maximum minus a basin minimum. Its location appears as a dashed line. <code>eyring_proxy_forward</code> and <code>eyring_proxy_reverse</code>, when available, apply the Eyring expression to those projected barriers using <code>kappa</code> (default 1; allowed range <code>0 &lt; kappa &lt;= 1</code>). They are <strong>proxies</strong>, not dynamically recovered rates. A one-dimensional projection can hide important coordinates.</p>
+<h2 id="reweight-a-normalized-colvar">Reweight a normalized COLVAR<a class="headerlink" href="#reweight-a-normalized-colvar" title="Permanent link">&para;</a></h2>
+<p>For a metadynamics trajectory, the log weight is:</p>
+<p><code>log(w) = [V(s,t) − c(t) + other biases being removed] / (RT)</code></p>
+<p>PLUMED's <code>metad.rbias</code> contains <code>V − c(t)</code>. Alternatively, supply both <code>metad.bias</code> and <code>metad.rct</code>; the analysis subtracts the latter. <strong>Raw metadynamics bias alone is insufficient for population reweighting.</strong> Do not supply <code>rbias_column</code> and <code>rct_column</code> together.</p>
+<p>This small example assigns weights 1, 2, 4, and 8 to four equally populated bins. The most heavily weighted bin becomes the free-energy minimum. Both supported ways of specifying normalization give the same result.</p>
+<pre class="pyodide"><code>import numpy as np
+from matmalib import mlmd, Plot
+
+rt = 0.00831446261815324 * 300
+q = np.tile([0.5, 1.5, 2.5, 3.5], 10)
+rbias = np.tile(rt * np.log([1, 2, 4, 8]), 10)
+rct = np.full(len(q), 20.0)
+rows = np.column_stack((np.arange(len(q)), q, rbias, rbias + rct, rct))
+np.savetxt("weighted-COLVAR", rows,
+           header="#! FIELDS time q metad.rbias metad.bias metad.rct", comments="")
+
+common = dict(colvar="weighted-COLVAR", cv="q", cv_unit="dimensionless",
+              temperature=300, bins=4, grid_range=(0, 4), smooth_window=0)
+fes = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(
+    **common, rbias_column="metad.rbias"))
+equivalent = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(
+    **common, bias_column="metad.bias", rct_column="metad.rct"))
+np.testing.assert_allclose(fes.free_energy, equivalent.free_energy)
+print("Relative energies:", np.round(fes.free_energy, 3), "kJ/mol")
+print("Weight effective sample size:",
+      round(fes.summary["sampling"]["weight_effective_sample_size"], 2))
+fig, ax = Plot().fes_1d(fes, show_basins=False)
+ax.set_title("Known weights: 1, 2, 4, 8")</code></pre>
+<p>COLVAR must contain a <code>time</code> column with strictly increasing times and regularly spaced selected samples. <code>start_time</code> and <code>end_time</code> select an <strong>inclusive</strong> interval in the file's time units. At least two samples must remain. <code>bins</code> is an integer of at least 3; <code>grid_range=(low, high)</code> fixes the histogram edges. Keep this range and the number of bins fixed when comparing profiles.</p>
+<p>The parser accepts repeated identical headers. When reading a COLVAR being written by a live simulation, it omits an unfinished final line and records a warning. Completed malformed rows, changing headers, and duplicate or decreasing times are errors. Do not concatenate restarted trajectories without first resolving time resets.</p>
+<h2 id="inspect-a-histogram-and-its-unsampled-regions">Inspect a histogram and its unsampled regions<a class="headerlink" href="#inspect-a-histogram-and-its-unsampled-regions" title="Permanent link">&para;</a></h2>
+<p>An unbiased trajectory has unit weights. The same analysis API can represent that case with an explicitly zero bias column. <strong>Use zeros only when the samples are actually unbiased</strong>; they cannot correct a metadynamics run with missing bias information.</p>
+<pre class="pyodide"><code>import numpy as np
+from matmalib import mlmd, Plot
+
+rng = np.random.default_rng(14)
+q = np.r_[rng.normal(-0.9, 0.12, 900), rng.normal(0.9, 0.12, 600)]
+rng.shuffle(q)
+rows = np.column_stack((np.arange(len(q)) * 0.1, q, np.zeros(len(q))))
+np.savetxt("unbiased-COLVAR", rows,
+           header="#! FIELDS time q unbiased_weight", comments="")
+
+fes = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(
+    colvar="unbiased-COLVAR", cv="q", temperature=300,
+    rbias_column="unbiased_weight", bins=60, grid_range=(-1.5, 1.5),
+    reactant=(-1.5, -0.3), product=(0.3, 1.5), smooth_window=0,
+))
+for name, value in fes.summary["sampling"].items():
+    print(name, ":", value)
+print("Finite bins:", np.isfinite(fes.free_energy).sum())
+print("Forward barrier available:", "eyring_proxy_forward" in fes.summary)
+fig, ax = Plot().fes_1d(fes)
+ax.set_title("An unsampled gap stays a gap")</code></pre>
+<p>Empty histogram bins have <code>+inf</code> free energy and appear as gaps. The library neither adds pseudocounts nor interpolates a barrier across these bins. Basin populations can still be reported, but a missing path between their minima prevents a resolved barrier and Eyring proxy.</p>
+<p>Read <code>fes.summary["sampling"]</code> before interpreting a COLVAR profile:</p>
+<table>
+<thead>
+<tr>
+<th>Diagnostic</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>samples</code>, <code>start_time</code>, <code>end_time</code></td>
+<td>Number and time range of selected observations</td>
+</tr>
+<tr>
+<td><code>empty_bins</code></td>
+<td>Bins with no selected observations</td>
+</tr>
+<tr>
+<td><code>samples_outside_grid</code></td>
+<td>Selected samples excluded by the histogram range</td>
+</tr>
+<tr>
+<td><code>weight_effective_sample_size</code></td>
+<td><code>(sum w)^2 / sum(w^2)</code>; a small value means a few weighted frames dominate</td>
+</tr>
+</tbody>
+</table>
+<p>The effective sample size is a <strong>weight diagnostic</strong> over selected frames, including frames outside the grid. It does not correct for temporal correlation and is not an uncertainty estimate. Inspect <code>fes.warnings</code>, input field ranges in <code>summary["inputs"]</code>, and any <code>barrier_unavailable</code> or <code>profile_unavailable</code> explanation as well.</p>
+<h2 id="read-defaults-and-walls-from-the-saved-plumed-input">Read defaults and walls from the saved PLUMED input<a class="headerlink" href="#read-defaults-and-walls-from-the-saved-plumed-input" title="Permanent link">&para;</a></h2>
+<p><code>plumed_input="plumed.dat"</code> can infer the CV, temperature, units, PRINT output path, bias labels, and supported wall definitions. Relative input paths are resolved against the saved PLUMED file. Explicit analysis settings override inferred defaults. Input parsing supports the common single-line and <code>ACTION ...</code> block syntax, with exactly one METAD action on one explicit CV; it is not a general PLUMED preprocessor.</p>
+<p>This example writes a small saved input and a matching synthetic COLVAR. Its recorded wall energy is removed automatically in the default analysis. <code>keep_wall=True</code> retains that restraint, so the two curves answer different thermodynamic questions.</p>
+<pre class="pyodide"><code>from pathlib import Path
+import numpy as np
+from matmalib import mlmd, Plot
+
+Path("wall-example.dat").write_text(
+    "UNITS LENGTH=nm ENERGY=kj/mol TIME=ps\n"
+    "q: DISTANCE ATOMS=1,2\n"
+    "metad: METAD ARG=q SIGMA=0.02 HEIGHT=1 PACE=100 BIASFACTOR=10 TEMP=300\n"
+    "wall: UPPER_WALLS ARG=q AT=0.8 KAPPA=100 EXP=2\n"
+    "PRINT ARG=q,metad.rbias,wall.bias FILE=wall-COLVAR STRIDE=10\n"
+)
+q = np.tile(np.linspace(0.1, 1.1, 11), 20)
+wall = 100 * np.maximum(q - 0.8, 0)**2
+np.savetxt("wall-COLVAR", np.column_stack((np.arange(len(q)), q, q * 0, wall)),
+           header="#! FIELDS time q metad.rbias wall.bias", comments="")
+
+common = dict(plumed_input="wall-example.dat", bins=11,
+              grid_range=(0.05, 1.15), smooth_window=0)
+removed = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(**common))
+retained = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(**common, keep_wall=True))
+fig, ax = Plot().fes_1d(removed, show_basins=False, label="Wall removed")
+Plot().fes_1d(retained, ax=ax, show_basins=False,
+              label="Wall retained", color="#d48122")
+print("Inferred units:", removed.cv_unit, removed.summary["input_energy_unit"])</code></pre>
+<p>Without saved input, set <code>additional_bias=("wall.bias",)</code> to add that recorded bias to the population log weights. You are choosing which restraints to remove; the code cannot infer the desired physical ensemble from a column name alone.</p>
+<p>For an existing FES or a HILLS reconstruction, <code>upper_wall=(at, kappa)</code> subtracts the quadratic energy <code>kappa * max(q − at, 0)^2</code> in the input energy units. With <code>hills</code> and <code>plumed_input</code>, a compatible single-CV quadratic upper wall can be inferred automatically, including its EPS/OFFSET settings. <code>keep_wall=True</code> disables inferred wall removal. Do not combine it with <code>upper_wall</code>. Lower or more complex walls require an appropriate explicit treatment. Removing a wall's energy cannot recover a region the trajectory never sampled.</p>
+<h2 id="reconstruct-from-hills-on-your-computer">Reconstruct from HILLS on your computer<a class="headerlink" href="#reconstruct-from-hills-on-your-computer" title="Permanent link">&para;</a></h2>
+<p>Use this local workflow when a run has HILLS but lacks normalized COLVAR weights:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span><span class="p">,</span> <span class="n">Plot</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">simulation</span> <span class="o">=</span> <span class="n">mlmd</span><span class="p">()</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">fes</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">analyze_metadynamics</span><span class="p">(</span><span class="n">mlmd</span><span class="o">.</span><span class="n">AnalysisConfig</span><span class="p">(</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">hills</span><span class="o">=</span><span class="s2">"run/HILLS"</span><span class="p">,</span> <span class="n">plumed_input</span><span class="o">=</span><span class="s2">"run/plumed.dat"</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">bins</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">grid_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.15</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="c1"># plumed="/path/to/plumed",  # optional explicit executable</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">output_dir</span><span class="o">=</span><span class="s2">"hills-analysis"</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">))</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">Plot</span><span class="p">()</span><span class="o">.</span><span class="n">fes_1d</span><span class="p">(</span><span class="n">fes</span><span class="p">,</span> <span class="n">energy_unit</span><span class="o">=</span><span class="s2">"kcal/mol"</span><span class="p">)</span>
+</code></pre></div>
+<p>The executable is found beside the current Python executable or on <code>PATH</code>, unless <code>plumed</code> is supplied. This calls <code>plumed sum_hills</code> and reads its output. PLUMED already applies the well-tempered scaling: <strong>do not multiply the returned energies by the bias-factor correction again</strong>. If no <code>grid_range</code> is given, the range is inferred from the deposited hill centers. Inspect that choice rather than assuming it includes every region of interest.</p>
+<p>Choose <code>hills</code> or <code>fes_file</code>, not both. <code>grid_range</code> and <code>bins</code> configure reconstruction or histogramming; they do not resample an existing FES file. <code>grid_range</code> is rejected with <code>fes_file</code>. Time-window selection and population-reweighting column arguments apply to COLVAR, not HILLS or supplied FES grids.</p>
+<p>For older COLVAR files containing only raw bias, <code>plumed_input</code> plus the matching HILLS and explicit METAD grid bounds can recover missing <code>c(t)</code> using PLUMED. This recovery supports a nonperiodic, one-dimensional, single-walker, fixed-width well-tempered run with a constant bias factor greater than one. The grid must cover all samples and hill centers. Reconstructed and recorded raw bias must agree within 0.01 kJ/mol; inconsistent histories are rejected. Read <code>summary["bias_reconstruction"]</code> and its warnings. This path also requires local PLUMED.</p>
+<h3 id="periodic-cvs-and-multidimensional-profiles">Periodic CVs and multidimensional profiles<a class="headerlink" href="#periodic-cvs-and-multidimensional-profiles" title="Permanent link">&para;</a></h3>
+<p>Simulation setup can define a torsion CV, but this analysis currently has <strong>no periodic-boundary-crossing basin or barrier treatment</strong>. FES grids marked periodic are rejected. COLVAR histogramming treats its numeric coordinate as a line; it does not join <code>-pi</code> to <code>pi</code>. A basin split across that seam will therefore be misrepresented unless you first choose and validate a suitable unwrapped reaction path. Simply deleting periodic metadata does not make the analysis valid.</p>
+<p>Multidimensional HILLS and repeated-coordinate FES tables are also unsupported. Prepare a physically appropriate one-dimensional marginal grid externally before using <code>fes_file</code>; do not flatten a multidimensional surface into a one-dimensional list. These restrictions are distinct from periodic simulation cells: a nonperiodic distance CV measured in a periodic cell can still be suitable for this analysis.</p>
+<h2 id="compare-time-blocks-before-interpreting-the-profile">Compare time blocks before interpreting the profile<a class="headerlink" href="#compare-time-blocks-before-interpreting-the-profile" title="Permanent link">&para;</a></h2>
+<p>One profile does not establish convergence, and the API does not automatically calculate block uncertainties. Compare time windows on the same grid, inspect repeated transitions, and check stability against bin resolution and independent runs. The following creates three independent synthetic blocks with the same underlying distribution, then compares their basin free energies.</p>
+<pre class="pyodide"><code>import numpy as np
+from matmalib import mlmd, Plot
+
+rng = np.random.default_rng(27)
+centers = np.linspace(-1.45, 1.45, 30)
+target_energy = 6 * (centers**2 - 1)**2 + 0.5 * centers
+probability = np.exp(-target_energy / (0.00831446261815324 * 300))
+probability /= probability.sum()
+block_size = 2000
+q = rng.choice(centers, size=3 * block_size, p=probability)
+np.savetxt("blocks-COLVAR", np.column_stack((np.arange(len(q)), q, q * 0)),
+           header="#! FIELDS time q unbiased_weight", comments="")
+
+differences = []
+ax = None
+for block, color in enumerate(("#235789", "#d48122", "#38995b")):
+    fes = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(
+        colvar="blocks-COLVAR", cv="q", temperature=300,
+        rbias_column="unbiased_weight", bins=30, grid_range=(-1.5, 1.5),
+        start_time=block * block_size, end_time=(block + 1) * block_size - 1,
+        reactant=(-1.5, -0.4), product=(0.4, 1.5), smooth_window=0,
+    ))
+    differences.append(fes.summary["delta_g_product_minus_reactant_kj_mol"])
+    fig, ax = Plot().fes_1d(fes, ax=ax, show_basins=False,
+                          label=f"Block {block + 1}", color=color)
+print("Block basin differences:", np.round(differences, 3), "kJ/mol")
+print("Sample standard deviation:", round(float(np.std(differences, ddof=1)), 3))
+ax.set_title("Compare profiles with identical histogram edges")</code></pre>
+<p>The displayed standard deviation describes these three block estimates. It is not automatically a confidence interval or a standard error for a correlated molecular trajectory. Real blocks must be long enough to address correlation and explore the relevant states; biased trajectories also need valid weights in each selected interval. Agreement among undersampled windows can be misleading.</p>
+<p>Analyze separate equilibrium runs separately. A list of COLVAR files is reserved for <strong>independent infrequent first-passage runs</strong> with <code>infrequent=True</code>; it is not an equilibrium-pooling option.</p>
+<h2 id="smooth-the-display-and-export-results">Smooth the display and export results<a class="headerlink" href="#smooth-the-display-and-export-results" title="Permanent link">&para;</a></h2>
+<p><code>smooth_window</code> defaults to 11 points. Set it to 0 to disable smoothing, or to an odd integer of at least 5. The implementation fits a <strong>local cubic polynomial</strong>, not a Gaussian kernel. It smooths each finite sampled segment independently, reduces the window for short segments, and leaves segments shorter than five points unchanged. Gaps remain gaps. The smoothed curve is shifted to a zero minimum.</p>
+<p>Smoothing affects the plotted curve and optional smoothed CSV. Basin populations, barriers, and rate estimates use the <strong>raw</strong> profile. A smooth curve is not evidence of convergence. There is no Gaussian-smoothing configuration option.</p>
+<pre class="pyodide"><code>from pathlib import Path
+import numpy as np
+from matmalib import mlmd, Plot
+
+q = np.linspace(-1.5, 1.5, 101)
+energy_kcal = (8 * (q**2 - 1)**2 + 0.4 * np.sin(35 * q)) / 4.184
+np.savetxt("noisy-fes.dat", np.column_stack((q, energy_kcal)),
+           header="#! FIELDS q energy", comments="")
+
+simulation = mlmd()
+directory = simulation.analyze_metadynamics(mlmd.AnalysisConfig(
+    fes_file="noisy-fes.dat", cv="q", temperature=300,
+    energy_column="energy", energy_unit="kcal/mol", cv_unit="dimensionless",
+    smooth_window=11, output_dir="analysis-export", plot=True, overwrite=True,
+), output_format="files")
+fes = simulation.data
+print("Saved:", ", ".join(path.name for path in sorted(directory.iterdir())))
+print("Stored energy units:", fes.energy_unit)
+fig, ax = Plot().fes_1d(fes, energy_unit="kcal/mol", show_raw=True,
+                       show_basins=False, label="Local cubic smoothing")
+ax.set_title("Input, display, and export units are explicit")</code></pre>
+<p>The generated CSV, JSON, and PNG files appear as downloads under the browser example. In a local run they are written into <code>output_dir</code>. Set <code>overwrite=True</code> only when replacing earlier analysis outputs is intended; it is enabled here to make repeated clicks work. Input files are protected from being overwritten by output filenames.</p>
+<table>
+<thead>
+<tr>
+<th>Output</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>free_energy.csv</code></td>
+<td>Coordinate and raw relative free energy in kJ/mol</td>
+</tr>
+<tr>
+<td><code>free_energy_smoothed.csv</code></td>
+<td>Display-smoothed profile, only when smoothing is enabled</td>
+</tr>
+<tr>
+<td><code>summary.json</code></td>
+<td>Source files, method, units, diagnostics, basin results, and warnings</td>
+</tr>
+<tr>
+<td><code>free_energy.png</code></td>
+<td>Plot when <code>plot=True</code> and a profile is available</td>
+</tr>
+</tbody>
+</table>
+<p>The default <code>output_format="data"</code> returns the <code>Data</code> object. It still writes files when <code>output_dir</code> is supplied. <code>output_format="files"</code> requires <code>output_dir</code> and returns a <code>Path</code>; the <code>Data</code> object remains available as <code>simulation.data</code>. <code>plot=True</code> also requires an output directory.</p>
+<p>The returned object's main attributes are <code>x</code>, <code>free_energy</code>, <code>free_energy_smoothed</code>, two-column <code>data</code>, <code>energy_unit</code>, <code>cv</code>, <code>cv_unit</code>, <code>temperature_K</code>, <code>summary</code>, and <code>warnings</code>. <code>Plot.fes_1d()</code> returns <code>(figure, axes)</code> and retains them as <code>plot.fig</code> and <code>plot.ax</code>. Use <code>energy_unit</code> to change display units, <code>smooth_window</code> to override display smoothing, <code>show_raw</code> to show the original curve under a smoothed one, and <code>show_basins</code> to control basin shading and the barrier marker. <code>ax</code>, <code>color</code>, and <code>label</code> support overlays as shown above. Display changes do not alter the stored raw energy array.</p>
+<h2 id="analyze-independent-infrequent-metadynamics-passages">Analyze independent infrequent-metadynamics passages<a class="headerlink" href="#analyze-independent-infrequent-metadynamics-passages" title="Permanent link">&para;</a></h2>
+<p>First-passage analysis has a different data contract from equilibrium population reweighting. It needs independent runs starting at time zero in the explicit reactant range, with strictly increasing times. Each run ends at its first recorded entry into the product range, or contributes right-censored exposure if no entry is observed.</p>
+<p>Use the cumulative PLUMED acceleration column when available (<code>acceleration_column="metad.acc"</code>), or the <strong>raw</strong> nonnegative bias (<code>bias_column="metad.bias"</code>). A normalized <code>rbias</code> is not a kinetic acceleration bias. The estimator is events divided by total accelerated exposure. With no events, the result is a one-sided exponential rate bound instead of a measured zero rate.</p>
+<pre class="pyodide"><code>import numpy as np
+from matmalib import mlmd
+
+rt = 0.00831446261815324 * 300
+paths = []
+for label, endpoint in (("event", 0.30), ("censored", 0.22)):
+    path = f"passage-{label}.COLVAR"
+    rows = np.column_stack(([0, 1, 2], [0.20, 0.23, endpoint],
+                            np.full(3, rt * np.log(10))))
+    np.savetxt(path, rows, header="#! FIELDS time q metad.bias", comments="")
+    paths.append(path)
+
+result = mlmd().analyze_metadynamics(mlmd.AnalysisConfig(
+    colvar=paths, cv="q", cv_unit="nm", temperature=300, time_unit="ps",
+    infrequent=True, bias_column="metad.bias",
+    reactant=(0.18, 0.25), product=(0.28, 0.35),
+))
+for name in ("independent_runs", "events", "right_censored_runs", "rate_s_inv"):
+    print(name, ":", result.summary[name])
+print("FES available:", len(result.x) &gt; 0)
+print(result.summary["profile_unavailable"])</code></pre>
+<p>The constant synthetic bias gives an acceleration factor of 10: each two-picosecond record contributes 20 ps of accelerated exposure. One event over 40 ps gives <code>2.5e10 s⁻¹</code>. This arithmetic example does not validate the physical assumptions of infrequent metadynamics.</p>
+<p>The method assumes sufficiently infrequent deposition, negligible transition-state bias, independent equilibrated reactant starts, and exponential escape statistics. Active additional restraint-bias columns before first passage are rejected; adding a wall's energy to an acceleration factor is not a general kinetic correction. Output stride limits the event time resolution. Raw-bias integration should be checked against finer output; a recorded cumulative acceleration is preferable when available.</p>
+<p>At least five uncensored independent runs enable a reproducible parametric-bootstrap exponential-fit diagnostic in the summary. Its p-value is a fit diagnostic, not proof of unbiased kinetics. <code>kappa</code> enters the reported activation-free-energy conversion and Eyring proxies, not the event/exposure rate estimator.</p>
+<p>A kinetics-only result can have empty <code>x</code> and <code>free_energy</code> arrays. Do not pass it to <code>Plot.fes_1d()</code>. You can supply a suitable <code>hills</code> or <code>fes_file</code> alongside the independent COLVAR runs to analyze a profile as well. <code>summary.json</code> is still exportable when no FES is available.</p>
+<p>Continue with the <a href="../../reference/api/">MLMD API and configuration reference</a> and the <a href="../../reference/mlmd-script-parity/">script feature map</a>. For the existing two-coordinate count-based landscape, see <a href="../free-energy/">free-energy and population maps</a>; <code>Plot.fes()</code> does not perform this metadynamics reweighting.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../mlmd-restarts/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Save and restart">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Save and restart
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../molecules/" class="md-footer__link md-footer__link--next" aria-label="Next: Molecules and geometry">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Molecules and geometry
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.3.9"}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../assets/playground.js"></script>
+      
+    
+  </body>
+</html>
