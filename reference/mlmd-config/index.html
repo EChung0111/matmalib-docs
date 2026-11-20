@@ -1927,8 +1927,12 @@
 <td>Radians</td>
 </tr>
 <tr>
-<td>Analysis free energies</td>
+<td>1D analysis free energies</td>
 <td>kJ/mol internally; <code>Plot.fes_1d</code> can convert its displayed energy axis</td>
+</tr>
+<tr>
+<td>2D analysis free energies</td>
+<td>Returned arrays use the requested <code>energy_unit</code> (kJ/mol or kcal/mol)</td>
 </tr>
 </tbody>
 </table>
@@ -2185,11 +2189,6 @@
 <td><code>10</code></td>
 </tr>
 <tr>
-<td><code>wrap_output</code></td>
-<td><code>bool</code></td>
-<td><code>False</code></td>
-</tr>
-<tr>
 <td><code>log_file</code></td>
 <td><code>str \| PathLike \| None</code></td>
 <td><code>'md.log'</code></td>
@@ -2243,7 +2242,10 @@
 </table>
 <p><strong>Integration and ensembles.</strong> <code>steps × timestep_fs</code> is the duration requested for this phase. NVE uses velocity Verlet; <code>temperature_K</code> initializes velocities when requested rather than applying a thermostat. NVT supports <code>"langevin"</code>, <code>"berendsen"</code>, and <code>"nose-hoover"</code>; Nose–Hoover chains reject constraints. NPT supports isotropic <code>"mtk"</code> or <code>"berendsen"</code> dynamics, requires full three-dimensional PBC and stress from the calculator, and disallows constraints. Ensemble, thermostat, and barostat names are matched case-insensitively. <code>thermostat_time_fs</code> and <code>barostat_time_fs</code> set coupling times; the chain fields configure the chain integrators. NPT includes its thermostat; the NVT <code>thermostat</code> selector does not choose it. <code>pressure_bar</code> is the NPT target; <code>compressibility_per_bar</code> is required by the Berendsen barostat and should match the material.</p>
 <p><strong>Velocities and masses.</strong> <code>initialize_velocities=None</code> preserves existing momenta and initializes when absent; <code>True</code> requests fresh thermal velocities, and <code>False</code> requires input momenta/velocities. A plain geometry without them is rejected with <code>False</code>. <code>seed</code> controls initialization and stochastic dynamics. <code>remove_com_motion</code> removes translation only when initializing an unconstrained system with more than one atom; persistent fixing is controlled separately by <code>fix_com</code>. <code>hydrogen_mass</code> replaces hydrogen masses, while <code>heavy_mass_multiplier</code> scales other masses. Existing velocities are preserved when masses change. These settings alter the dynamics and are not mass-conserving repartitioning. <code>max_velocity_angstrom_fs</code> and <code>max_force_eV_A</code> are abort thresholds, not clipping operations.</p>
-<p><strong>Files and diagnostics.</strong> <code>trajectory</code>, <code>trajectory_interval</code>, <code>wrap_output</code>, <code>log_file</code>, and <code>log_interval</code> control streamed output and its cadence. Wrapping changes the written coordinates. <code>checkpoint_interval</code> controls periodic checkpoint saves; a final checkpoint is also written. <code>checkpoint_file="auto"</code> derives a name from the run output, while <code>None</code> disables checkpointing. Reusing output paths requires <code>overwrite=True</code>. Checkpoints and trajectory files are distinct; see <a href="../../learn/mlmd-restarts/">restart behavior</a>.</p>
+<p><strong>Files and diagnostics.</strong> <code>trajectory</code>, <code>trajectory_interval</code>, <code>log_file</code>, and <code>log_interval</code> control streamed output and its cadence. Periodic frames are always wrapped using their own current cell. ASE's <code>frame.wrap()</code> changes only the output copy; live coordinates, momenta, force/bias caches, and checkpoint state are preserved. Nonperiodic output is unchanged. Wrapping has no configuration switch.</p>
+<p><code>checkpoint_interval</code> controls periodic checkpoint saves; a final checkpoint is also written. <code>checkpoint_file="auto"</code> derives a name from the run output, while <code>None</code> disables checkpointing. Reusing output paths requires <code>overwrite=True</code>. Checkpoints and trajectory files are distinct; see <a href="../../learn/mlmd-restarts/">restart behavior</a>.</p>
+<p>MD logs use aligned, fixed-width columns and remain readable with <code>numpy.loadtxt</code>. NPT logs always include <code>Pressure_bar</code>: instantaneous pressure in bar from potential and kinetic stress, including any PLUMED bias virial. The <code>pressure_bar</code> field in <code>simulation.data.initial</code>, <code>.final</code> and <code>.averages</code> holds the corresponding diagnostics. <code>MDConfig.pressure_bar</code> remains the target used by the barostat.</p>
+<p>Completed logs include a commented summary of simulated time, total wall time, mean wall time per step, ns/day, sample count, and average temperature, energies, volume, maximum force, and NPT pressure. Averages match <code>simulation.data.averages</code>. Restart duration and performance cover the current segment; zero-step timing and performance are <code>n/a</code>.</p>
 <p><strong>Phases and bias.</strong> Set <code>mode="metadynamics"</code> together with <code>metadynamics=MetadynamicsConfig(...)</code> for a biased run. Optional <code>minimization</code> and <code>equilibration</code> configs prepare the input before production. <code>continue_equilibration_bias=True</code> keeps one live PLUMED instance across compatible equilibration and production phases; it requires matching bias settings and timestep. It is not a replacement for a disk checkpoint.</p>
 <h2 id="equilibrationconfig">EquilibrationConfig<a class="headerlink" href="#equilibrationconfig" title="Permanent link">&para;</a></h2>
 <p>Inherits <a href="#mdconfig">MDConfig</a>, including its <a href="#systemconfig">SystemConfig</a> fields. These defaults are overridden:</p>
@@ -2548,13 +2550,82 @@
 <td><code>str \| PathLike \| None</code></td>
 <td><code>None</code></td>
 </tr>
+<tr>
+<td><code>cvs</code></td>
+<td><code>tuple[mlmd.CVConfig \| dict[str, Any], ...] \| list \| None</code></td>
+<td><code>None</code></td>
+</tr>
+<tr>
+<td><code>pause_when</code></td>
+<td><code>mlmd.DepositionPause \| mlmd.DepositionPauseGroup \| dict[str, Any] \| None</code></td>
+<td><code>None</code></td>
+</tr>
 </tbody>
 </table>
+<p><strong>Structured CVs and pauses.</strong> <code>cvs=None</code> preserves the scalar configuration.
+Otherwise supply one or two <code>mlmd.CVConfig</code> objects or equivalent dictionaries.
+Each requires <code>label</code>, <code>type</code> (<code>DISTANCE</code>, <code>ANGLE</code>, or <code>TORSION</code>), one-based <code>atoms</code>,
+and positive <code>sigma</code>. Optional <code>unit</code> defaults to <code>nm</code> or <code>rad</code>. Distance CVs also
+accept <code>unit="angstrom"</code> (aliases <code>"A"</code>, <code>"Å"</code>), interpreting <code>sigma</code> and supplied
+grid bounds in Å before conversion to canonical nm. Angular CV widths remain
+radians. The optional
+<code>grid_min</code>, <code>grid_max</code>, and <code>grid_bins</code> default to <code>None</code>, giving grid-free hill
+evaluation without fixed simulation bounds. All CVs must be grid-free or all
+must have complete grid triplets; partial/mixed grids are rejected.
+Per-CV fields replace the scalar CV/grid fields;
+with <code>cvs</code>, omit scalar <code>grid_max</code>/<code>grid_bins</code>, keep scalar <code>grid_min=0</code>, and do not
+enable <code>grid_auto</code>. These scalar grids are rejected even when redundant.
+An explicit <code>metad_arg</code> must match all ordered CV labels. When a grid is supplied,
+torsion bounds must be <code>[-pi, pi]</code>, and allocation is limited to two million points,
+counting <code>grid_bins + 1</code> along each axis. Grid-free torsions remain periodic.</p>
+<p><code>pause_when=None</code> keeps depositing normally. With <code>cvs</code>, supply
+<code>mlmd.DepositionPause(cv, comparison, threshold, unit=None)</code> or a group created by
+<code>DepositionPause.all(*conditions)</code> or <code>.any(*conditions)</code>. Equivalent dictionaries
+are accepted. <code>cv</code> names a configured label and <code>comparison</code> is <code>&gt;=</code> or <code>&lt;=</code>,
+including equality. <code>unit=None</code> inherits the input CV's configured unit: Å for an
+angstrom CV, otherwise nm/rad. Explicit <code>unit="angstrom"</code> or <code>"nm"</code> selects the
+distance threshold unit; <code>unit="deg"</code> converts angular thresholds to radians.
+Canonical validated/saved CVs always use nm/rad, so a new threshold with no unit
+against those dictionaries uses nm/rad. An explicit unit must be
+appropriate to the CV type. Thresholds must lie within the CV's physical domain,
+or within its explicit grid when present. PLUMED output and canonical saved
+metadata always use nm/radians. For example, <code>sigma=0.2, unit="angstrom"</code> and
+<code>DepositionPause("distance", "&gt;=", 3.5, unit="angstrom")</code> become a 0.02 nm width
+and a 0.35 nm threshold internally.</p>
+<p><code>DepositionPause.between(cv, lower, upper, unit=None)</code> constructs an inclusive
+interval by combining <code>&gt;= lower</code> and <code>&lt;= upper</code> with <code>all</code>. For example,
+<code>mlmd.DepositionPause.between("torsion", -15, 15, unit="deg")</code> pauses within
+−15° to 15°. Its lower bound must not exceed its upper bound; a torsion interval
+crossing ±180° instead needs two comparisons joined by <code>any</code>.</p>
+<p><code>DepositionPauseGroup(operator, conditions)</code> stores a nonempty group with
+<code>operator="all"</code> or <code>"any"</code>. Groups can nest and combine different CVs; <code>all</code>
+requires every child condition, whereas <code>any</code> requires at least one. The complete
+rule controls new hill updates for the joint bias. Existing bias and output
+continue, and deposition resumes at an eligible PACE step when the rule becomes
+false. Rules support up to 32 comparisons and eight levels of nesting.
+Structured controls and custom <code>input_lines</code>/<code>plumed_file</code> are mutually exclusive.
+CV labels, definitions, and pause rules persist through portable checkpoints.
+Existing checkpoints keep their saved rule and grid or grid-free representation,
+including older notebook runs; new-run settings do not override a checkpoint.</p>
 <p><strong>Input.</strong> Supply either <code>plumed_file</code> or <code>input_lines</code> for custom actions, or use the generated-input settings. Custom input controls its own CVs, units, bias parameters, output paths, and restart directives; generated fields do not override its actions. <code>save_input</code> writes the resolved input for reproducibility. <code>log_file</code> selects the native PLUMED log.</p>
-<p><strong>Collective variable and deposition.</strong> Generated input supports <code>DISTANCE</code>, <code>ANGLE</code>, and <code>TORSION</code>. <code>cv_label</code> names the CV and <code>atoms</code> selects its unique one-based indices. <code>metad_label</code> names the bias; <code>metad_arg=None</code> uses <code>cv_label</code>. <code>sigma</code>, <code>height_kj_mol</code>, <code>pace</code>, and <code>biasfactor</code> configure well-tempered Gaussian deposition; the bias factor must exceed one. <code>temperature_K=None</code> uses the dynamics temperature; an explicit positive value overrides the generated METAD temperature without changing the MD thermostat temperature. Keep these temperatures physically consistent for your intended protocol.</p>
-<p><strong>History/output.</strong> For generated input, <code>hills_file</code> records deposited Gaussians. <code>colvar_file</code> and <code>colvar_stride</code> control observable output. With <code>colvar_arg=None</code>, the implementation selects available CV/bias/normalization columns; an explicit value selects requested PLUMED fields, omitting references to disabled wall and normalization fields. Generated HILLS/COLVAR paths must be distinct and contain no whitespace.</p>
-<p><strong>Walls.</strong> <code>wall_type</code> selects an upper or lower wall. <code>wall_label</code> and <code>wall_arg</code> name the wall and its argument; <code>wall_arg=None</code> uses the CV. <code>wall_at</code>, <code>wall_kappa</code>, <code>wall_exp</code>, <code>wall_eps</code>, and <code>wall_offset</code> configure its position and shape in the PLUMED unit system.</p>
-<p><strong>Normalization grid.</strong> <code>grid_auto</code>, <code>grid_min</code>, <code>grid_max</code>, <code>grid_bins</code>, and <code>grid_spacing</code> control the metadynamics grid. <code>calc_rct</code> controls normalization needed for reweighted analysis. With automatic defaults, normalization and a grid are enabled for a fixed-cell, fully periodic scalar distance CV; a complete explicit grid also enables normalization unless <code>calc_rct=False</code>. An explicit grid requires both <code>grid_max</code> and <code>grid_bins</code>, with <code>grid_min &lt; grid_max</code>. NPT and other CVs need suitable explicit bounds when requesting normalization. Use the <a href="../../learn/mlmd-metadynamics/">metadynamics tutorial</a> before enabling a bias: generated defaults are not an experiment-specific CV definition.</p>
+<p><strong>Collective variable and deposition.</strong> Generated input supports <code>DISTANCE</code>, <code>ANGLE</code>, and <code>TORSION</code>. In scalar mode, <code>cv_label</code> names the CV and <code>atoms</code> selects its unique one-based indices. <code>metad_label</code> names the bias; <code>metad_arg=None</code> uses <code>cv_label</code> in scalar mode or all ordered labels with <code>cvs</code>. <code>sigma</code>, <code>height_kj_mol</code>, <code>pace</code>, and <code>biasfactor</code> configure well-tempered Gaussian deposition; the bias factor must exceed one. <code>temperature_K=None</code> uses the dynamics temperature; an explicit positive value overrides the generated METAD temperature without changing the MD thermostat temperature. Keep these temperatures physically consistent for your intended protocol.</p>
+<p><strong>History/output.</strong> For generated input, <code>hills_file</code> records deposited Gaussians. <code>colvar_file</code> and <code>colvar_stride</code> control observable output. With <code>colvar_arg=None</code>, the implementation selects available CV/bias/normalization columns. An explicit value selects requested PLUMED fields: scalar input omits references to disabled wall/normalization fields, whereas structured <code>cvs</code> rejects unavailable fields. Generated HILLS/COLVAR paths must be distinct and contain no whitespace.</p>
+<p><strong>Walls.</strong> <code>wall_type</code> selects an upper or lower wall. <code>wall_label</code> and <code>wall_arg</code> name the wall and its argument; <code>wall_arg=None</code> uses the CV for a scalar or single structured CV. With two structured CVs, explicitly select one label using <code>wall_arg</code>. <code>wall_at</code>, <code>wall_kappa</code>, <code>wall_exp</code>, <code>wall_eps</code>, and <code>wall_offset</code> configure its position and shape in the PLUMED unit system.</p>
+<p><strong>Normalization grid.</strong> Structured grid-free CVs emit no <code>GRID_*</code> or <code>CALC_RCT</code>
+options, and default COLVAR output has no <code>metad.rbias</code>/<code>metad.rct</code> columns.
+<code>calc_rct=True</code> requires complete explicit per-CV grids; those grids enable
+normalization by default unless <code>calc_rct=False</code>. In the legacy scalar API,
+<code>grid_auto</code>, <code>grid_min</code>, <code>grid_max</code>, <code>grid_bins</code>, and <code>grid_spacing</code> retain their
+earlier behavior: a fixed-cell, fully periodic distance can use automatic bounds,
+while NPT and other CVs need explicit bounds for normalization.</p>
+<p>For grid-free two-CV runs, <code>mlmd.reconstruct_two_cv_hills</code> infers analysis bounds
+from HILLS and accepts <code>bins</code> for reconstruction resolution. These are analysis
+coordinates, not a simulation cutoff. Optional <code>temperature_K</code> adds integrated
+marginal profiles. Returned arrays and plots use the selected <code>energy_unit</code>, while
+the raw PLUMED DAT file uses kJ/mol. Normalized-COLVAR population reweighting and
+cumulative time-window diagnostics require <code>metad.rbias</code>; the HILLS helper provides
+a full-history bias-based estimate instead. See the
+<a href="../../learn/mlmd-metadynamics/">metadynamics tutorial</a> for both workflows.</p>
 <h2 id="analysisconfig">AnalysisConfig<a class="headerlink" href="#analysisconfig" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2721,7 +2792,7 @@
 <p><strong>Profiles and weights.</strong> <code>bins</code> and <code>grid_range</code> define a histogram/reconstruction grid; <code>grid_range</code> cannot resample an existing <code>fes_file</code>. <code>energy_column</code> names the existing-grid free-energy column. <code>rbias_column</code> supplies normalized bias directly, or <code>bias_column</code> and <code>rct_column</code> supply its components. <code>additional_bias</code> names recorded static-bias columns to remove through population reweighting. <code>start_time</code> and <code>end_time</code> restrict the COLVAR population histogram to an inclusive time window; they do not truncate first-passage runs or HILLS. <code>upper_wall=(at, kappa)</code> subtracts a quadratic upper wall from a supplied or reconstructed FES. <code>keep_wall</code> disables automatic wall removal and conflicts with <code>upper_wall</code>; for COLVAR, explicitly named <code>additional_bias</code> columns are still removed.</p>
 <p><strong>Basins and kinetics.</strong> <code>reactant</code> and <code>product</code> specify non-overlapping CV intervals; provide both or neither. Absent explicit intervals, a profile may receive inferred basin assignments. <code>kappa</code> (greater than zero and at most one) enters Eyring proxies and the rate-to-activation-energy conversion; it does not change the first-passage event/exposure rate estimator. <code>infrequent=True</code> requests first-passage analysis of independent COLVAR runs; explicit basin ranges are required. <code>acceleration_column</code> selects a cumulative acceleration factor instead of integrating raw <code>bias_column</code>. Multiple COLVAR inputs are accepted only for this independent-run mode. Rate interpretation requires the assumptions discussed in <a href="../../learn/mlmd-analysis/">FES and kinetics analysis</a>.</p>
 <p><strong>Display and export.</strong> <code>smooth_window</code> is zero (off) or an odd integer of at least five, configuring local cubic least-squares smoothing. Raw thermodynamics retain the unsmoothed profile and unsampled gaps. <code>output_dir</code> enables CSV/JSON output; <code>plot=True</code> additionally requests a PNG and requires that directory. <code>overwrite</code> protects existing exports. For directory return instead of <code>Data</code>, call <code>analyze_metadynamics(config, output_format="files")</code>.</p>
-<p>The current analysis supports one CV and rejects FES grids marked periodic. COLVAR histograms treat the coordinate as a line and do not join its periodic endpoints, so boundary-crossing basins are unsupported. It has no automatic convergence certificate or uncertainty estimator. Compare independent sampling, inspect diagnostics, and follow the <a href="../../learn/mlmd-analysis/">analysis tutorial</a>.</p>
+<p>This <code>AnalysisConfig</code> API supports one CV and rejects FES grids marked periodic. COLVAR histograms treat the coordinate as a line and do not join its periodic endpoints, so boundary-crossing basins are unsupported. The separate <code>analyze_two_cv</code> and <code>reconstruct_two_cv_hills</code> methods handle joint surfaces and periodic torsions. Neither workflow provides an automatic convergence certificate or uncertainty estimator. Compare independent sampling, inspect diagnostics, and follow the <a href="../../learn/mlmd-analysis/">analysis tutorial</a>.</p>
 
 
 
@@ -2817,7 +2888,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.3.9"}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.4.1"}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>

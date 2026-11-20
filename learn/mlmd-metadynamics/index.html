@@ -810,6 +810,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#two-cvs-and-optional-hill-pauses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two CVs and optional hill pauses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#add-an-optional-wall" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1717,6 +1728,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#two-cvs-and-optional-hill-pauses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Two CVs and optional hill pauses
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#add-an-optional-wall" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1805,7 +1827,7 @@
 
 
 <h1 id="run-metadynamics-with-plumed">Run metadynamics with PLUMED<a class="headerlink" href="#run-metadynamics-with-plumed" title="Permanent link">&para;</a></h1>
-<p><code>mlmd.run_md</code> can add a PLUMED bias to an ASE-compatible potential. The built-in configuration generates well-tempered metadynamics for one distance, angle, or torsion; custom PLUMED input supports additional actions and multiple collective variables (CVs). This tutorial covers configuration, native execution, outputs, continuous equilibration, and restart.</p>
+<p><code>mlmd.run_md</code> can add a PLUMED bias to an ASE-compatible potential. Structured CVs generate grid-free well-tempered metadynamics for one or two distances, angles, or torsions, with optional reversible hill-deposition pauses. Explicit grids remain available for normalized COLVAR analysis. Custom PLUMED input supports additional actions. This tutorial covers configuration, native execution, outputs, continuous equilibration, and restart.</p>
 <p>Metadynamics deposits history-dependent hills along selected CVs. Choosing a CV, Gaussian width, deposition interval, and bias strength requires physical knowledge of the process being sampled; faster motion in a chosen CV alone does not establish a converged free-energy surface. See the <a href="https://www.plumed.org/doc-v2.10/user-doc/html/_m_e_t_a_d.html">PLUMED METAD documentation</a> for the method and action options.</p>
 <h2 id="1-install-native-plumed">1. Install native PLUMED<a class="headerlink" href="#1-install-native-plumed" title="Permanent link">&para;</a></h2>
 <p>Use the repository's environment from its root directory:</p>
@@ -1829,7 +1851,7 @@
 <tr>
 <td>Atom selections</td>
 <td><code>fixed_atoms</code> uses zero-based positions</td>
-<td><code>MetadynamicsConfig.atoms</code> uses <strong>one-based</strong> positions</td>
+<td><code>CVConfig.atoms</code> and scalar <code>MetadynamicsConfig.atoms</code> use <strong>one-based</strong> positions</td>
 </tr>
 <tr>
 <td>Length</td>
@@ -1863,15 +1885,20 @@
 </tr>
 </tbody>
 </table>
-<p>PLUMED's default units apply to input parameters and output files; custom input can change them with an initial <code>UNITS</code> directive. See <a href="https://www.plumed.org/doc-v2.10/user-doc/html/_u_n_i_t_s.html">PLUMED UNITS</a>.</p>
+<p>Structured distance CVs accept <code>unit="angstrom"</code>: matmalib converts their width,
+optional grid bounds, and inherited pause thresholds to PLUMED's native nm.
+HILLS/COLVAR and canonical saved metadata remain in nm. The default <code>unit=None</code>
+retains nm for distance CVs. Custom PLUMED input can select its own units with an
+initial <code>UNITS</code> directive. See <a href="https://www.plumed.org/doc-v2.10/user-doc/html/_u_n_i_t_s.html">PLUMED UNITS</a>.</p>
 <pre class="pyodide"><code>from matmalib import mlmd
 
-meta = mlmd.MetadynamicsConfig(atoms=(3, 11), sigma=0.02, pace=300,
+cv = mlmd.CVConfig("distance", "DISTANCE", (3, 11), sigma=0.2, unit="angstrom")
+meta = mlmd.MetadynamicsConfig(cvs=(cv,), pace=300,
                                colvar_stride=10)
 md = mlmd.MDConfig(steps=100000, timestep_fs=0.5,
                    mode="metadynamics", metadynamics=meta)
-print("Selected zero-based positions:", tuple(i - 1 for i in meta.atoms))
-print("Distance width:", 10 * meta.sigma, "angstrom")
+print("Selected zero-based positions:", tuple(i - 1 for i in cv.atoms))
+print("Distance width:", cv.sigma, cv.unit)
 print("Hill interval:", meta.pace * md.timestep_fs, "fs")
 print("COLVAR interval:", meta.colvar_stride * md.timestep_fs / 1000, "ps")
 print("Run duration:", md.steps * md.timestep_fs / 1000, "ps")</code></pre>
@@ -1888,32 +1915,31 @@ print("Run duration:", md.steps * md.timestep_fs / 1000, "ps")</code></pre>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">simulation</span> <span class="o">=</span> <span class="n">mlmd</span><span class="p">(</span><span class="n">calculator</span><span class="o">=</span><span class="n">EMT</span><span class="p">())</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MetadynamicsConfig</span><span class="p">(</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">cv</span><span class="o">=</span><span class="s2">"DISTANCE"</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">sigma</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">height_kj_mol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">pace</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="n">cvs</span><span class="o">=</span><span class="p">(</span><span class="n">mlmd</span><span class="o">.</span><span class="n">CVConfig</span><span class="p">(</span><span class="s2">"distance"</span><span class="p">,</span> <span class="s2">"DISTANCE"</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">"angstrom"</span><span class="p">),),</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">height_kj_mol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">pace</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="n">biasfactor</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">colvar_stride</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">calc_rct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">grid_auto</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">hills_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"HILLS"</span><span class="p">,</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">colvar_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"COLVAR"</span><span class="p">,</span>
-<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">save_input</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.dat"</span><span class="p">,</span>
-<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    <span class="n">log_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.log"</span><span class="p">,</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="p">)</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="n">trajectory</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">run_md</span><span class="p">(</span>
-<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="n">bulk</span><span class="p">(</span><span class="s2">"Cu"</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    <span class="n">mlmd</span><span class="o">.</span><span class="n">MDConfig</span><span class="p">(</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>        <span class="n">steps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">timestep_fs</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>        <span class="n">ensemble</span><span class="o">=</span><span class="s2">"NVT"</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span>
-<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>        <span class="n">mode</span><span class="o">=</span><span class="s2">"metadynamics"</span><span class="p">,</span> <span class="n">metadynamics</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
-<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>        <span class="n">trajectory</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"trajectory.xyz"</span><span class="p">,</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>        <span class="n">trajectory_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>        <span class="n">log_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"md.log"</span><span class="p">,</span>
-<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>        <span class="n">log_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    <span class="p">),</span>
-<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="p">)</span>
-<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Trajectory:"</span><span class="p">,</span> <span class="n">trajectory</span><span class="p">)</span>
-<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Checkpoint:"</span><span class="p">,</span> <span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">checkpoint_file</span><span class="p">)</span>
-<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Final step:"</span><span class="p">,</span> <span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">last_step</span><span class="p">)</span>
-<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Resolved PLUMED:"</span><span class="p">)</span>
-<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">plumed_input</span><span class="p">))</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">hills_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"HILLS"</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="n">colvar_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"COLVAR"</span><span class="p">,</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">save_input</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.dat"</span><span class="p">,</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    <span class="n">log_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.log"</span><span class="p">,</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="p">)</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="n">trajectory</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">run_md</span><span class="p">(</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    <span class="n">bulk</span><span class="p">(</span><span class="s2">"Cu"</span><span class="p">,</span> <span class="n">cubic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    <span class="n">mlmd</span><span class="o">.</span><span class="n">MDConfig</span><span class="p">(</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>        <span class="n">steps</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">timestep_fs</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>        <span class="n">ensemble</span><span class="o">=</span><span class="s2">"NVT"</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>        <span class="n">mode</span><span class="o">=</span><span class="s2">"metadynamics"</span><span class="p">,</span> <span class="n">metadynamics</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>        <span class="n">trajectory</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"trajectory.xyz"</span><span class="p">,</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>        <span class="n">trajectory_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>        <span class="n">log_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"md.log"</span><span class="p">,</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>        <span class="n">log_interval</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    <span class="p">),</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="p">)</span>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Trajectory:"</span><span class="p">,</span> <span class="n">trajectory</span><span class="p">)</span>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Checkpoint:"</span><span class="p">,</span> <span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">checkpoint_file</span><span class="p">)</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Final step:"</span><span class="p">,</span> <span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">last_step</span><span class="p">)</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"Resolved PLUMED:"</span><span class="p">)</span>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">plumed_input</span><span class="p">))</span>
 </code></pre></div>
 <p>Expect a streamed XYZ trajectory through step 100, an MD log, a final checkpoint, and PLUMED input/log/HILLS/COLVAR files. The simulation lasts only 20 fs. Re-running with the same names raises instead of silently replacing files; select a new output directory for another check.</p>
 <p>For a molecular MLMD calculation, use <code>simulation = mlmd(...)</code> with appropriate AIMNet weights or another validated ASE calculator, and replace the copper structure with your equilibrated <code>State</code> or extended XYZ path. Choose the CV atoms for that system. The <a href="../mlmd-solvation/">solvation tutorial</a> creates <code>equilibrated.xyz</code>; retain its cell and PBC metadata for a periodic run.</p>
@@ -1960,7 +1986,7 @@ print("Run duration:", md.steps * md.timestep_fs / 1000, "ps")</code></pre>
 </tr>
 <tr>
 <td><code>metad_arg</code>, <code>wall_arg</code></td>
-<td>Default to the CV label; references must correspond to available actions.</td>
+<td><code>metad_arg</code> defaults to all structured CV labels; a two-CV wall needs an explicit <code>wall_arg</code>. Scalar arguments default to <code>cv_label</code>.</td>
 </tr>
 <tr>
 <td><code>colvar_stride</code>, <code>colvar_arg</code></td>
@@ -1969,7 +1995,101 @@ print("Run duration:", md.steps * md.timestep_fs / 1000, "ps")</code></pre>
 </tbody>
 </table>
 <p>For nonperiodic systems, generated CV input includes <code>NOPBC</code>. For periodic systems PLUMED uses the box supplied at each step. Partial periodicity is rejected: use either no periodic axes or full three-dimensional PBC. If your CV needs molecule reconstruction or a special treatment of periodic images, express it in custom PLUMED input rather than assuming wrapped coordinates are sufficient.</p>
-<p>The generated form defines one scalar CV. Use custom input for a multidimensional bias, combinations of CVs, or other PLUMED actions. <code>metad_arg</code> changes references; it does not create additional CV definitions.</p>
+<p>The scalar fields define one CV. Use <code>cvs</code> for one or two explicit CV definitions in a joint bias. <code>metad_arg</code> changes references; it does not create additional CV definitions. Other combinations or PLUMED actions still use custom input.</p>
+<h3 id="two-cvs-and-optional-hill-pauses">Two CVs and optional hill pauses<a class="headerlink" href="#two-cvs-and-optional-hill-pauses" title="Permanent link">&para;</a></h3>
+<pre class="pyodide"><code>from matmalib import mlmd
+
+cvs = (
+    mlmd.CVConfig("distance", "DISTANCE", (3, 11), sigma=0.2, unit="angstrom"),
+    mlmd.CVConfig("torsion", "TORSION", (1, 5, 17, 23), sigma=0.15),
+)
+meta = mlmd.MetadynamicsConfig(
+    cvs=cvs,
+    pause_when=mlmd.DepositionPause.between("torsion", -15, 15, unit="deg"),
+    pace=200, height_kj_mol=2, biasfactor=10,
+    hills_file="HILLS", colvar_file="COLVAR", save_input="plumed.dat",
+)
+# Use meta with your existing simulation.run_md(..., MDConfig(...)) call.
+print("CVs:", [cv.label for cv in cvs])
+print("Grid allocation:", mlmd.validate_metadynamics(cvs)["grid_points"])</code></pre>
+<p>Each CV has its own Gaussian width. Atom indices are one-based; the configured
+distance width uses Å here and angular widths use radians. Internally, distance
+values are converted to nm. Grid fields default to <code>None</code>: this example
+does not impose a fixed distance cutoff or create a bias grid. Torsions retain
+their physical periodicity on <code>[-pi, pi]</code>. Equivalent dictionaries with the same
+field names as <code>CVConfig</code>, <code>DepositionPause</code>, and <code>DepositionPauseGroup</code> are
+accepted, including JSON configuration.</p>
+<p>The example pauses hills while <code>-15 &lt;= torsion &lt;= 15</code> in degrees, including both
+endpoints. <code>unit="deg"</code> applies only to these angular thresholds; the torsion
+width and PLUMED data remain in radians. With <code>unit=None</code>, thresholds use the
+selected CV's configured units: Å for a distance with <code>unit="angstrom"</code>, nm for
+other distances, and radians for angles/torsions. An explicit threshold unit
+overrides that default; <code>unit="angstrom"</code> always means Å, including when passing
+already-normalized CV dictionaries whose canonical unit is nm.
+Use <code>pause_when=None</code> to disable the pause.</p>
+<p><code>between</code> is a convenience for two inclusive comparisons combined with <code>all</code>:</p>
+<pre class="pyodide"><code>from matmalib import mlmd
+
+interval = mlmd.DepositionPause.all(
+    mlmd.DepositionPause("torsion", "&gt;=", -15, unit="deg"),
+    mlmd.DepositionPause("torsion", "&lt;=", 15, unit="deg"),
+)
+print("Pause operator:", interval.operator)</code></pre>
+<p><code>all(...)</code> requires every condition to hold; <code>any(...)</code> requires at least one.
+Groups can contain other groups and comparisons on different CVs. For example,
+pause when <code>distance &gt;= 3.5</code> Å <strong>or</strong> the torsion lies within −15° to 15°:</p>
+<pre class="pyodide"><code>from matmalib import mlmd
+
+cvs = (
+    mlmd.CVConfig("distance", "DISTANCE", (3, 11), sigma=0.2, unit="angstrom"),
+    mlmd.CVConfig("torsion", "TORSION", (1, 5, 17, 23), sigma=0.15),
+)
+pause_when = mlmd.DepositionPause.any(
+    mlmd.DepositionPause("distance", "&gt;=", 3.5, unit="angstrom"),
+    mlmd.DepositionPause.between("torsion", -15, 15, unit="deg"),
+)
+meta = mlmd.MetadynamicsConfig(cvs=cvs, pause_when=pause_when)
+spec = mlmd.validate_metadynamics(cvs, meta.pause_when)
+print("Pause operator:", spec["stop_rule"]["operator"])</code></pre>
+<p>All new hills in the joint bias pause while the complete rule is true, then
+resume on the next scheduled deposition step after it becomes false. Dynamics,
+existing bias forces, walls, and COLVAR output continue. Thresholds shown here
+are examples; select them for your system. The rule requires <code>cvs</code>, which may
+contain a single CV. Structured controls cannot be combined with <code>input_lines</code>
+or <code>plumed_file</code>.</p>
+<p>Torsions are compared on their signed <code>[-pi, pi]</code> domain. <code>between</code> requires its
+lower bound to be no greater than its upper bound. To pause across the periodic
+seam, use <code>any(torsion &gt;= 165°, torsion &lt;= -165°)</code> as two <code>DepositionPause</code>
+comparisons, each with <code>unit="deg"</code>.</p>
+<p>Portable checkpoints retain both CV definitions, the pause rule, the joint HILLS
+history and COLVAR output. <code>restart_md</code> restores these without a notebook wrapper,
+including checkpoints from the earlier <code>AIMNET_METAD_V1</code> notebook format. Changing
+from a one-CV bias to two CVs requires a new bias history. Existing checkpoints
+retain their original labels, pause rules, and grids or grid-free representation.
+Changing a new-run configuration does not replace the saved rule used by
+<code>restart_md</code>.</p>
+<p>Grid-free runs save HILLS and COLVAR containing the CVs, accumulated bias and
+optional pause indicator. They do not emit <code>CALC_RCT</code>, <code>metad.rbias</code> or
+<code>metad.rct</code>. Reconstruct a two-CV FES from the completed HILLS history:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">fes</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">reconstruct_two_cv_hills</span><span class="p">(</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">"HILLS"</span><span class="p">,</span> <span class="n">cvs</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s2">"hills_fes_2d"</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">energy_unit</span><span class="o">=</span><span class="s2">"kJ/mol"</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="p">)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">figure</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">plot_two_cv_hills</span><span class="p">(</span><span class="n">fes</span><span class="p">,</span> <span class="n">distance_unit</span><span class="o">=</span><span class="s2">"angstrom"</span><span class="p">)</span>
+</code></pre></div>
+<p>Native PLUMED runs in the same process and infers the analysis extent from the
+deposited hills. <code>bins</code> sets reconstruction resolution; these analysis bounds do
+not restrict the simulation. Supplying <code>temperature_K</code> adds marginal profiles by
+integrating <code>exp(-F/RT)</code> over the other CV within that reconstructed extent. Without
+it, the result is a surface only. Arrays and plots use the selected <code>energy_unit</code>
+(kJ/mol or kcal/mol); the raw PLUMED DAT file remains in kJ/mol. Outputs are
+protected unless <code>overwrite=True</code>; input files are always protected. Distance
+arrays and numeric artifacts remain in nm. <code>distance_unit="angstrom"</code> changes
+only displayed distance axes and marginal coordinates; angular axes remain radians.</p>
+<p>This HILLS surface is a full-history bias-based estimate. The helpers cannot
+derive normalized population reweighting or cumulative reweighted time windows
+from grid-free COLVAR bias alone. Those diagnostics remain available for runs
+that recorded normalized bias using an explicit grid, as described below.</p>
 <h3 id="add-an-optional-wall">Add an optional wall<a class="headerlink" href="#add-an-optional-wall" title="Permanent link">&para;</a></h3>
 <pre class="pyodide"><code>from matmalib import mlmd
 
@@ -1982,9 +2102,16 @@ meta = mlmd.MetadynamicsConfig(
 print("Wall location:", meta.wall_at * 10, "angstrom")
 print("Wall action:", meta.wall_type)
 print("Energy scale:", meta.wall_kappa, "in generated PLUMED energy units")</code></pre>
-<p><code>UPPER_WALLS</code> or <code>LOWER_WALLS</code> enables a wall; <code>wall_type=None</code> disables it. <code>wall_at</code>/<code>wall_offset</code> follow the CV units. <code>wall_kappa</code>, <code>wall_exp</code>, and <code>wall_eps</code> control the PLUMED wall potential. A strong wall can produce large forces and restrict accessible states; choose its location and stiffness deliberately. The resulting <code>wall.bias</code> is printed by default and matters when interpreting or removing bias in analysis.</p>
+<p><code>UPPER_WALLS</code> or <code>LOWER_WALLS</code> enables a wall; <code>wall_type=None</code> disables it. With two structured CVs, set <code>wall_arg</code> to the desired CV label. The scalar wall fields retain PLUMED units: <code>wall_at</code>/<code>wall_offset</code> use nm for a distance or radians for an angle, including when a structured distance configuration uses angstrom input. <code>wall_kappa</code>, <code>wall_exp</code>, and <code>wall_eps</code> control the PLUMED wall potential. A strong wall can produce large forces and restrict accessible states; choose its location and stiffness deliberately. The resulting <code>wall.bias</code> is printed by default and matters when interpreting or removing bias in analysis.</p>
 <h3 id="decide-whether-to-use-a-grid-and-normalized-bias">Decide whether to use a grid and normalized bias<a class="headerlink" href="#decide-whether-to-use-a-grid-and-normalized-bias" title="Permanent link">&para;</a></h3>
-<p><code>calc_rct=True</code> requests PLUMED's normalization estimate and adds <code>metad.rbias</code> and <code>metad.rct</code> to the default COLVAR columns. It requires a bias grid. Those columns enable normalized population reweighting in the <a href="../mlmd-analysis/">analysis tutorial</a>; raw <code>metad.bias</code> alone is not used as a normalized population weight.</p>
+<p>Explicit bias grids remain supported when normalized population reweighting is
+needed. For structured CVs, supply <code>grid_min</code>, <code>grid_max</code>, and <code>grid_bins</code> for every
+CV, or leave all three unset for every CV. Partial and mixed grids are rejected.
+Explicit torsion grids must cover <code>[-pi, pi]</code>. Allocation is limited to two million
+points, counting <code>grid_bins + 1</code> along each axis.</p>
+<p>Complete grids enable <code>CALC_RCT</code> by default and add <code>metad.rbias</code> and <code>metad.rct</code> to
+COLVAR. <code>calc_rct=False</code> disables normalization; <code>calc_rct=True</code> without a grid
+raises. Raw <code>metad.bias</code> alone is never used as a normalized population weight.</p>
 <table>
 <thead>
 <tr>
@@ -1994,107 +2121,119 @@ print("Energy scale:", meta.wall_kappa, "in generated PLUMED energy units")</cod
 </thead>
 <tbody>
 <tr>
-<td>Fully periodic, fixed-cell scalar DISTANCE</td>
-<td>Defaults <code>grid_auto=None, calc_rct=None</code> select an automatic grid and normalized bias when no explicit grid is supplied.</td>
+<td>Structured CVs, any supported ensemble</td>
+<td>Grid-free by default; reconstruct from HILLS.</td>
 </tr>
 <tr>
-<td>Same system, explicit bounds</td>
-<td>Set <code>grid_min</code>, <code>grid_max</code>, <code>grid_bins</code>, and <code>grid_auto=False</code>; use <code>calc_rct=True</code> for normalized bias.</td>
+<td>Structured CVs with normalized COLVAR analysis</td>
+<td>Supply complete per-CV grids; retain default <code>calc_rct=None</code> and normalization columns.</td>
 </tr>
 <tr>
-<td>Nonperiodic distance, angle, or torsion</td>
-<td>No automatic grid. Supply an appropriate complete grid for normalized bias, or use <code>calc_rct=False</code>.</td>
+<td>Legacy scalar DISTANCE, fully periodic fixed cell</td>
+<td>With <code>cvs=None</code>, defaults retain the automatic grid and normalized bias.</td>
 </tr>
 <tr>
-<td>NPT distance</td>
-<td>Automatic bounds are disabled because the cell evolves. Use explicit bounds with <code>grid_auto=False</code>, or disable normalization and analyze HILLS.</td>
+<td>Legacy scalar NPT, nonperiodic distance, angle, or torsion</td>
+<td>No automatic grid; supply a complete scalar grid for normalization or reconstruct from HILLS.</td>
 </tr>
 </tbody>
 </table>
-<p>Automatic distance bounds are derived from the fixed cell's half-cell corners, converted to nm, and extended by a margin related to <code>sigma</code>. <code>grid_spacing</code> defaults to 0.002 nm and controls the resulting bin count. Automatic <code>grid_min</code> must be finite and at most zero. For explicit grids, both <code>grid_max</code> and a positive integer <code>grid_bins</code> are required, with <code>grid_min &lt; grid_max</code>; setting <code>calc_rct=True</code> without a complete grid raises.</p>
-<p>For example, an explicit distance grid could be configured as follows after choosing bounds that contain your sampled distances and hill support:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MetadynamicsConfig</span><span class="p">(</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">atoms</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">grid_auto</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">grid_min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">grid_max</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">grid_bins</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">calc_rct</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">hills_file</span><span class="o">=</span><span class="s2">"npt_HILLS"</span><span class="p">,</span> <span class="n">colvar_file</span><span class="o">=</span><span class="s2">"npt_COLVAR"</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="n">save_input</span><span class="o">=</span><span class="s2">"npt_plumed.dat"</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">)</span>
+<p>Legacy automatic distance bounds use the fixed cell's half-cell corners and a
+margin related to <code>sigma</code>; <code>grid_spacing</code> controls their resolution. They are not
+used by grid-free structured CVs. Explicit grids should cover the expected CV
+range and hill support; a fixed grid can become unsuitable as an NPT cell changes.</p>
+<p>For a completed two-CV run that recorded <code>metad.rbias</code>, load its saved definitions
+and compute population-reweighted analysis:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">saved_spec</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">read_metadynamics_spec</span><span class="p">(</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">Path</span><span class="p">(</span><span class="s2">"gridded_run/plumed.dat"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">)</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">fes</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">analyze_two_cv</span><span class="p">(</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="s2">"gridded_run/COLVAR"</span><span class="p">,</span> <span class="n">saved_spec</span><span class="p">[</span><span class="s2">"cvs"</span><span class="p">],</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    <span class="n">bins</span><span class="o">=</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">output_dir</span><span class="o">=</span><span class="s2">"reweighted_fes_2d"</span><span class="p">,</span> <span class="n">energy_unit</span><span class="o">=</span><span class="s2">"kJ/mol"</span><span class="p">,</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">)</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">figure</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">plot_two_cv</span><span class="p">(</span><span class="n">fes</span><span class="p">,</span> <span class="n">distance_unit</span><span class="o">=</span><span class="s2">"angstrom"</span><span class="p">)</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">windows</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">plot_two_cv_windows</span><span class="p">(</span><span class="n">fes</span><span class="p">,</span> <span class="n">distance_unit</span><span class="o">=</span><span class="s2">"angstrom"</span><span class="p">)</span>
 </code></pre></div>
-<p>The 3 nm bound is an example, not an automatic guarantee for an expanding NPT cell. For a torsion, use a domain consistent with its angular periodicity and the native PLUMED action; do not reuse a distance grid. Matmalib's FES analysis is currently one-dimensional and does not support a basin crossing a periodic boundary.</p>
+<p>This result includes reweighted density/free energy, integrated 1D marginals,
+cumulative time windows and sampling diagnostics. Normalized input bias uses
+kJ/mol and time uses ps. Returned arrays use <code>energy_unit</code>; empty bins retain
+infinite free energy. The two-CV analysis handles periodic torsion samples; the
+one-dimensional basin API does not support basins crossing a periodic boundary.</p>
 <p>NPT additionally requires full PBC, a finite-volume cell, a stress-capable potential, and no fixed-atom, SHAKE, or center-of-mass constraints. The PLUMED virial contributes to pressure/stress, and the bias is updated once per integration step even if the integrator requests several force evaluations. A time-dependent bias also means that choosing <code>ensemble="NVE"</code> does not yield conservation of the unbiased system's energy.</p>
 <h2 id="5-supply-custom-plumed-input">5. Supply custom PLUMED input<a class="headerlink" href="#5-supply-custom-plumed-input" title="Permanent link">&para;</a></h2>
 <p>Use <strong>either</strong> <code>plumed_file</code> or <code>input_lines</code>. These replace generated CV/bias/wall/PRINT commands; fields such as <code>atoms</code>, <code>sigma</code>, <code>hills_file</code>, and <code>colvar_file</code> no longer define the custom actions or their destinations.</p>
 <p>This configuration defines two distances and a two-dimensional bias. It assumes at least four atoms; pair choices and hill widths must suit your system:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"custom_bias"</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MetadynamicsConfig</span><span class="p">(</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="n">input_lines</span><span class="o">=</span><span class="p">(</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="s2">"UNITS LENGTH=nm ENERGY=kj/mol TIME=ps"</span><span class="p">,</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="s2">"d1: DISTANCE ATOMS=1,2"</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        <span class="s2">"d2: DISTANCE ATOMS=3,4"</span><span class="p">,</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="sa">f</span><span class="s2">"m: METAD ARG=d1,d2 SIGMA=0.02,0.02 HEIGHT=1 PACE=300 "</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="sa">f</span><span class="s2">"BIASFACTOR=10 TEMP=300 FILE=</span><span class="si">{</span><span class="n">out</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'HILLS'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        <span class="sa">f</span><span class="s2">"PRINT ARG=d1,d2,m.bias STRIDE=10 FILE=</span><span class="si">{</span><span class="n">out</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'COLVAR'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
-<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    <span class="p">),</span>
-<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    <span class="n">save_input</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.dat"</span><span class="p">,</span>
-<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    <span class="n">log_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.log"</span><span class="p">,</span>
-<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">)</span>
-<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="c1"># In your prepared workflow:</span>
-<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a><span class="c1"># simulation.run_md(ready, mlmd.MDConfig(</span>
-<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a><span class="c1">#     mode="metadynamics", metadynamics=meta,</span>
-<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="c1">#     trajectory=out / "trajectory.xyz", log_file=out / "md.log",</span>
-<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a><span class="c1"># ))</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">out</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"custom_bias"</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">out</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MetadynamicsConfig</span><span class="p">(</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">input_lines</span><span class="o">=</span><span class="p">(</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        <span class="s2">"UNITS LENGTH=nm ENERGY=kj/mol TIME=ps"</span><span class="p">,</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        <span class="s2">"d1: DISTANCE ATOMS=1,2"</span><span class="p">,</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>        <span class="s2">"d2: DISTANCE ATOMS=3,4"</span><span class="p">,</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>        <span class="sa">f</span><span class="s2">"m: METAD ARG=d1,d2 SIGMA=0.02,0.02 HEIGHT=1 PACE=300 "</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>        <span class="sa">f</span><span class="s2">"BIASFACTOR=10 TEMP=300 FILE=</span><span class="si">{</span><span class="n">out</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'HILLS'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>        <span class="sa">f</span><span class="s2">"PRINT ARG=d1,d2,m.bias STRIDE=10 FILE=</span><span class="si">{</span><span class="n">out</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="s1">'COLVAR'</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="p">),</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    <span class="n">save_input</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.dat"</span><span class="p">,</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    <span class="n">log_file</span><span class="o">=</span><span class="n">out</span> <span class="o">/</span> <span class="s2">"plumed.log"</span><span class="p">,</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="p">)</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="c1"># In your prepared workflow:</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="c1"># simulation.run_md(ready, mlmd.MDConfig(</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="c1">#     mode="metadynamics", metadynamics=meta,</span>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="c1">#     trajectory=out / "trajectory.xyz", log_file=out / "md.log",</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="c1"># ))</span>
 </code></pre></div>
 <p>Alternatively, <code>mlmd.MetadynamicsConfig(plumed_file="my_plumed.dat", save_input="resolved.dat")</code> reads an existing file. Comments and blank lines are stripped, and PLUMED <code>...</code> blocks are flattened; nested or unterminated blocks are rejected. <code>save_input</code> stores that resolved input, also available as <code>simulation.data.plumed_input</code>.</p>
 <p>Custom commands control their own paths, units, periodic treatment, and restart directives. Relative output paths are interpreted by the native run, not automatically relative to <code>plumed_file</code>; use explicit paths for reproducibility. Matmalib's generated-output path protections do not inspect every custom <code>FILE</code> action, so use a fresh directory and avoid accidental reuse. The one-dimensional analysis API cannot directly reconstruct this two-dimensional example; use PLUMED tools or a separately prepared one-dimensional marginal grid.</p>
 <h2 id="6-keep-a-live-bias-through-equilibration">6. Keep a live bias through equilibration<a class="headerlink" href="#6-keep-a-live-bias-through-equilibration" title="Permanent link">&para;</a></h2>
 <p>Ordinary preparation is unbiased unless its own configuration explicitly requests metadynamics. To build the bias during equilibration and continue it during production, use one shared <code>MetadynamicsConfig</code> and <code>continue_equilibration_bias=True</code> in a single <code>run_md</code> call:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">simulation</span> <span class="o">=</span> <span class="n">mlmd</span><span class="p">()</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MetadynamicsConfig</span><span class="p">(</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">atoms</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">hills_file</span><span class="o">=</span><span class="s2">"continuous_HILLS"</span><span class="p">,</span> <span class="n">colvar_file</span><span class="o">=</span><span class="s2">"continuous_COLVAR"</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="n">save_input</span><span class="o">=</span><span class="s2">"continuous_plumed.dat"</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s2">"continuous_plumed.log"</span><span class="p">,</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="p">)</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">equilibration</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">EquilibrationConfig</span><span class="p">(</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    <span class="n">steps</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">timestep_fs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    <span class="n">ensemble</span><span class="o">=</span><span class="s2">"NVT"</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span> <span class="n">thermostat_time_fs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">"metadynamics"</span><span class="p">,</span> <span class="n">metadynamics</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    <span class="n">trajectory</span><span class="o">=</span><span class="s2">"biased_equilibration.xyz"</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s2">"biased_equilibration.log"</span><span class="p">,</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>    <span class="n">seed</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span>
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">)</span>
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="n">simulation</span><span class="o">.</span><span class="n">run_md</span><span class="p">(</span><span class="s2">"equilibrated.xyz"</span><span class="p">,</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MDConfig</span><span class="p">(</span>
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    <span class="n">steps</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">timestep_fs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    <span class="n">ensemble</span><span class="o">=</span><span class="s2">"NVT"</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span> <span class="n">thermostat_time_fs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">"metadynamics"</span><span class="p">,</span> <span class="n">metadynamics</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
-<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>    <span class="n">equilibration</span><span class="o">=</span><span class="n">equilibration</span><span class="p">,</span> <span class="n">continue_equilibration_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>    <span class="n">trajectory</span><span class="o">=</span><span class="s2">"biased_production.xyz"</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s2">"biased_production.log"</span><span class="p">,</span>
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>    <span class="n">seed</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span>
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="p">))</span>
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="nb">print</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">start_step</span><span class="p">,</span> <span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">last_step</span><span class="p">)</span>  <span class="c1"># 2000, 102000</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">simulation</span> <span class="o">=</span> <span class="n">mlmd</span><span class="p">()</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">meta</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MetadynamicsConfig</span><span class="p">(</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">atoms</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="n">hills_file</span><span class="o">=</span><span class="s2">"continuous_HILLS"</span><span class="p">,</span> <span class="n">colvar_file</span><span class="o">=</span><span class="s2">"continuous_COLVAR"</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">save_input</span><span class="o">=</span><span class="s2">"continuous_plumed.dat"</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s2">"continuous_plumed.log"</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">equilibration</span> <span class="o">=</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">EquilibrationConfig</span><span class="p">(</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>    <span class="n">steps</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">timestep_fs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="n">ensemble</span><span class="o">=</span><span class="s2">"NVT"</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span> <span class="n">thermostat_time_fs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">"metadynamics"</span><span class="p">,</span> <span class="n">metadynamics</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="n">trajectory</span><span class="o">=</span><span class="s2">"biased_equilibration.xyz"</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s2">"biased_equilibration.log"</span><span class="p">,</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    <span class="n">seed</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="p">)</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="n">simulation</span><span class="o">.</span><span class="n">run_md</span><span class="p">(</span><span class="s2">"equilibrated.xyz"</span><span class="p">,</span> <span class="n">mlmd</span><span class="o">.</span><span class="n">MDConfig</span><span class="p">(</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>    <span class="n">steps</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">timestep_fs</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">temperature_K</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    <span class="n">ensemble</span><span class="o">=</span><span class="s2">"NVT"</span><span class="p">,</span> <span class="n">thermostat</span><span class="o">=</span><span class="s2">"langevin"</span><span class="p">,</span> <span class="n">thermostat_time_fs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">"metadynamics"</span><span class="p">,</span> <span class="n">metadynamics</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="n">equilibration</span><span class="o">=</span><span class="n">equilibration</span><span class="p">,</span> <span class="n">continue_equilibration_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>    <span class="n">trajectory</span><span class="o">=</span><span class="s2">"biased_production.xyz"</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s2">"biased_production.log"</span><span class="p">,</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>    <span class="n">seed</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="p">))</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="nb">print</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">start_step</span><span class="p">,</span> <span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">last_step</span><span class="p">)</span>  <span class="c1"># 2000, 102000</span>
 </code></pre></div>
 <p>The live PLUMED instance, hill history, velocities, RNG, and clock continue across the boundary. HILLS/COLVAR remain shared; MD trajectories and logs have separate paths. Thermostat damping may change. Both phases must use identical timestep, target temperature, ensemble, metadynamics settings, and potential; cell/PBC/charge/multiplicity overrides must agree. Seeds must match when both are set. NPT retains the cell reached during equilibration.</p>
 <p>This also supports custom PLUMED input while the process remains alive. It is different from ending <code>equilibrate</code> and then starting an independent <code>run_md</code>: returning a <code>State</code> preserves molecular state but does not preserve a live PLUMED bias. Independent biased phases should use separate bias files unless you implement an explicit native restart workflow.</p>
 <h2 id="7-restart-generated-metadynamics-safely">7. Restart generated metadynamics safely<a class="headerlink" href="#7-restart-generated-metadynamics-safely" title="Permanent link">&para;</a></h2>
 <p>By default, checkpoints are written every 1,000 steps and at completion, including biased runs. <code>checkpoint_interval</code> changes the interval and <code>checkpoint_file=None</code> disables them. Save <code>simulation.data.checkpoint_file</code> before performing another operation that replaces <code>.data</code>.</p>
 <p>After the installation check above, run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ase.calculators.emt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EMT</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">simulation</span> <span class="o">=</span> <span class="n">mlmd</span><span class="p">(</span><span class="n">calculator</span><span class="o">=</span><span class="n">EMT</span><span class="p">())</span>  <span class="c1"># same potential as the original check</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">continued</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">restart_md</span><span class="p">(</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">"metad_check/trajectory.checkpoint.npz"</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="n">steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">trajectory</span><span class="o">=</span><span class="s2">"metad_check/part2.xyz"</span><span class="p">,</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    <span class="n">log_file</span><span class="o">=</span><span class="s2">"metad_check/part2.log"</span><span class="p">,</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">)</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">continued</span><span class="p">)</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">last_step</span><span class="p">)</span>  <span class="c1"># 150</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ase.calculators.emt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EMT</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">matmalib</span><span class="w"> </span><span class="kn">import</span> <span class="n">mlmd</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">simulation</span> <span class="o">=</span> <span class="n">mlmd</span><span class="p">(</span><span class="n">calculator</span><span class="o">=</span><span class="n">EMT</span><span class="p">())</span>  <span class="c1"># same potential as the original check</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">continued</span> <span class="o">=</span> <span class="n">simulation</span><span class="o">.</span><span class="n">restart_md</span><span class="p">(</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="s2">"metad_check/trajectory.checkpoint.npz"</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    <span class="n">steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    <span class="n">trajectory</span><span class="o">=</span><span class="s2">"metad_check/part2.xyz"</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>    <span class="n">log_file</span><span class="o">=</span><span class="s2">"metad_check/part2.log"</span><span class="p">,</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">)</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="nb">print</span><span class="p">(</span><span class="n">continued</span><span class="p">)</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="nb">print</span><span class="p">(</span><span class="n">simulation</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">last_step</span><span class="p">)</span>  <span class="c1"># 150</span>
 </code></pre></div>
 <p><code>steps</code> means <strong>additional</strong> integration steps. Restart restores molecular state, constraints, random-generator state, thermostat/barostat variables, and the original step count. Use the same ASE version and model/calculator settings; model weights are not embedded in a checkpoint.</p>
 <p>The new XYZ/log files are separate segments; existing files are protected. For generated PLUMED input, saved HILLS/COLVAR snapshots are copied to <code>part2.plumed/</code>, the saved input is updated to those paths, and native restart continues the bias and output history there. Original files are untouched. HILLS text precision can produce small numerical differences from an uninterrupted biased run.</p>
@@ -2230,7 +2369,7 @@ print("Energy scale:", meta.wall_kappa, "in generated PLUMED energy units")</cod
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.3.9"}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": "0.4.1"}</script>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
